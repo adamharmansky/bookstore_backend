@@ -29,4 +29,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{secrets.SSH_KEY}}
           REMOTE_HOST: bookstore.harmansky.xyz
           REMOTE_USER: bookstore
-          TARGET: /web/bookstore/back #dhfksadjadklfjasl
+          TARGET: /web/bookstore/back
