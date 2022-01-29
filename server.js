@@ -36,7 +36,7 @@ server.get('/list', (req, res) => {
 	var sql_command = "SELECT * FROM books"
 
 	if (urlObject.query.q) {
-		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR title LIKE '%" + urlObject.query.q + "%'"
+		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%' OR author LIKE '%" + urlObject.query.q + "%'"
 	}
 
 	sql_command += ' ORDER BY '
