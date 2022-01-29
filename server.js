@@ -17,7 +17,9 @@ server.get('/book', (req, res) => {
 		res.send(404)
 		return
 	}
-	sql_connection.query("SELECT isbn, title, year_pub, description, author_name, image, publisher_name, publisher_country FROM books LEFT JOIN authors USING (author_id) LEFT JOIN publishers USING (publisher_id) WHERE isbn=" + urlObject.query.book, (err, result) => {
+	const sql_command = "SELECT * FROM books WHERE isbn=" + urlObject.query.book
+	console.log(sql_command);
+	sql_connection.query(sql_command, (err, result) => {
 		try {
 			if (err) throw 400
 			if (result.length == 0) throw 404
@@ -31,10 +33,10 @@ server.get('/book', (req, res) => {
 server.get('/list', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
-	var sql_command = "SELECT isbn, title, year_pub, description, author_name, image, publisher_name, publisher_country FROM books LEFT JOIN authors USING (author_id) LEFT JOIN publishers USING (publisher_id)"
+	var sql_command = "SELECT * FROM books"
 
 	if (urlObject.query.q) {
-		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%'"
+		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR title LIKE '%" + urlObject.query.q + "%'"
 	}
 
 	sql_command += ' ORDER BY '
