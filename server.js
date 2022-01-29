@@ -48,7 +48,10 @@ server.get('/list', (req, res) => {
 	console.log(sql_command);
 
 	sql_connection.query(sql_command, (err, result) => {
-		if (err) res.send(500)
+		if (err) {
+			console.log("Epic bruh moment " + err)
+			res.send(500)
+		}
 		res.send(result)
 	})
 })
