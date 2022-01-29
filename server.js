@@ -31,7 +31,13 @@ server.get('/book', (req, res) => {
 server.get('/list', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
-	var sql_command = "SELECT isbn, title, year_pub, description, author_name FROM books LEFT JOIN authors USING (author_id) ORDER BY "
+	var sql_command = "SELECT isbn, title, year_pub, description, author_name FROM books LEFT JOIN authors USING (author_id)"
+
+	if (urlObject.query.q) {
+		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%'"
+	}
+
+	sql_command += ' ORDER BY '
 
 	if (urlObject.query.order_by) sql_command += urlObject.query.order_by
 	else                          sql_command += "year_pub"
@@ -41,10 +47,6 @@ server.get('/list', (req, res) => {
 	if (urlObject.query.order) sql_command += urlObject.query.order
 	else                       sql_command += "DESC"
 	
-	if (urlObject.query.q) {
-		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%'"
-	}
-
 	console.log(sql_command);
 
 	sql_connection.query(sql_command, (err, result) => {
