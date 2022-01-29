@@ -40,6 +40,10 @@ server.get('/list', (req, res) => {
 
 	if (urlObject.query.order) sql_command += urlObject.query.order
 	else                       sql_command += "DESC"
+	
+	if (urlObject.query.q) {
+		sql_command += " WHERE title LIKE " + urlObject.query.q
+	}
 
 	sql_connection.query(sql_command, (err, result) => {
 		if (err) res.send(500)
