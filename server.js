@@ -22,7 +22,6 @@ server.get('/book', (req, res) => {
 			if (err) throw 400
 			if (result.length == 0) throw 404
 			res.send(result)
-			//dadasd
 		} catch (err) {
 			res.send(err)
 		}
