@@ -65,7 +65,7 @@ server.get('/list', (req, res) => {
 sql_connection.connect((err) => {
 	if (err) throw err
 	console.log('Connected to SQL database')
-	sql_connection.query("USE bookstore", (err, result) => {
+	sql_connection.query("USE kniznica", (err, result) => {
 		if (err) throw err
 		console.log('Selected database: ' + JSON.stringify(result))
 	})
