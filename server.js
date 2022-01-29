@@ -17,7 +17,7 @@ server.get('/book', (req, res) => {
 		res.send(404)
 		return
 	}
-	sql_connection.query("SELECT isbn, title, year_pub, description, author_name FROM books LEFT JOIN authors USING (author_id) WHERE isbn=" + urlObject.query.book, (err, result) => {
+	sql_connection.query("SELECT isbn, title, year_pub, description, author_name, image FROM books LEFT JOIN authors USING (author_id) WHERE isbn=" + urlObject.query.book, (err, result) => {
 		try {
 			if (err) throw 400
 			if (result.length == 0) throw 404
