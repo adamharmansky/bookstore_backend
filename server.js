@@ -32,7 +32,7 @@ server.get('/book', (req, res) => {
 server.get('/list', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
-	var sql_command = "SELECT isbn, title, year_pub, description, author_name FROM books LEFT JOIN authors USING (author_id)"
+	var sql_command = "SELECT isbn, title, year_pub, description, author_name, image FROM books LEFT JOIN authors USING (author_id)"
 
 	if (urlObject.query.q) {
 		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%'"
