@@ -75,7 +75,8 @@ app.get('/list', (req, res) => {
 				console.log("Epic bruh moment " + err)
 				res.send(500)
 			}
-			res.send( {
+			// bruh
+			res.send({
 				books: result,
 				pageCount: resultt
 			})
