@@ -5,6 +5,8 @@ const util = require('util')
 const url = require('url')
 const fs = require('fs')
 
+const page_size = 4
+
 allowed_websites = 'https://bookstore.harmansky.xyz'
 const port = 3001
 
@@ -57,7 +59,7 @@ app.get('/list', (req, res) => {
 	if (urlObject.query.order) sql_command += urlObject.query.order
 	else                       sql_command += "DESC"
 
-	sql_command += " LIMIT " + (page*16) + ", 16";
+	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
 
 	console.log(sql_command);
 
@@ -77,7 +79,7 @@ app.get('/list', (req, res) => {
 			}
 			res.send({
 				books: result,
-				pageCount: Math.ceil(resultt[0]['COUNT(*)']/16.0)
+				pageCount: Math.ceil(resultt[0]['COUNT(*)']/page_size)
 			})
 		})
 	})
