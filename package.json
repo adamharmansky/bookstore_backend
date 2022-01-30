@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.2",
+    "https": "^1.0.0",
     "mysql": "^2.18.1",
     "url": "^0.11.0"
   }

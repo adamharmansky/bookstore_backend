@@ -1,16 +1,23 @@
 const express = require('express')
+const https = require('https')
 const mysql = require('mysql')
 const util = require('util')
 const url = require('url')
 const fs = require('fs')
 
-allowed_websites = 'http://bookstore.harmansky.xyz'
+allowed_websites = 'https://bookstore.harmansky.xyz'
 const port = 3001
 
 var sql_connection = mysql.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'root' })
-const server = express()
+var key = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/privkey.pem')
+var cert = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/cert.pem')
+var options = {
+	key: key,
+	cert: cert
+}
+const app = express()
 
-server.get('/book', (req, res) => {
+app.get('/book', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
 	if (!urlObject.query.book) {
@@ -30,10 +37,11 @@ server.get('/book', (req, res) => {
 	})
 })
 
-server.get('/list', (req, res) => {
+app.get('/list', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
 	var sql_command = "SELECT * FROM books"
+	var page = urlObject.query.page ? urlObject.query.page : 0;
 
 	if (urlObject.query.q) {
 		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%' OR author LIKE '%" + urlObject.query.q + "%'"
@@ -48,7 +56,9 @@ server.get('/list', (req, res) => {
 
 	if (urlObject.query.order) sql_command += urlObject.query.order
 	else                       sql_command += "DESC"
-	
+
+	sql_command += " LIMIT " + (page*16) + ", 16";
+
 	console.log(sql_command);
 
 	sql_connection.query(sql_command, (err, result) => {
@@ -56,9 +66,24 @@ server.get('/list', (req, res) => {
 			console.log("Epic bruh moment " + err)
 			res.send(500)
 		}
-		res.send(result)
+		var sql_command = "SELECT COUNT(*) FROM books"
+		if (urlObject.query.q) {
+			sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%' OR author LIKE '%" + urlObject.query.q + "%'"
+		}
+		sql_connection.query(sql_command, (errr, resultt) => {
+			if (err) {
+				console.log("Epic bruh moment " + err)
+				res.send(500)
+			}
+			res.send( {
+				books: result,
+				pageCount: resultt
+			})
+		}
 	})
 })
+
+var server = https.createServer(options, app)
 
 // SQL connection
 // requires unix socket authentication - script MUST be run as root!!!!
@@ -71,6 +96,6 @@ sql_connection.connect((err) => {
 	})
 })
 
-server.listen(port, () => {
+app.listen(port, () => {
 	console.log('Server started successfully')
 })
