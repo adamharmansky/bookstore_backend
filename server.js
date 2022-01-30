@@ -77,7 +77,7 @@ app.get('/list', (req, res) => {
 			}
 			res.send({
 				books: result,
-				pageCount: resultt[0]['COUNT(*)']
+				pageCount: Math.ceil(resultt[0]['COUNT(*)']/16.0)
 			})
 		})
 	})
