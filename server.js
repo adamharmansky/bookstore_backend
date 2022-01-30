@@ -77,7 +77,7 @@ app.get('/list', (req, res) => {
 			}
 			res.send({
 				books: result,
-				pageCount: resultt
+				pageCount: resultt[0]['COUNT(*)']
 			})
 		})
 	})
