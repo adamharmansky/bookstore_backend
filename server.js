@@ -4,6 +4,7 @@ const mysql = require('mysql')
 const util = require('util')
 const url = require('url')
 const fs = require('fs')
+const cors = require('cors')
 
 const page_size = 4
 
@@ -18,9 +19,10 @@ var options = {
 	cert: cert
 }
 const app = express()
+app.use(cors())
 
 app.get('/book', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
+	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
 	if (!urlObject.query.book) {
 		res.send(404)
@@ -40,7 +42,7 @@ app.get('/book', (req, res) => {
 })
 
 app.post('/book/new', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
+	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 //	const sql_command = "INSERT INTO books (author, title, subject, keywords, desc, read_time, pages, year_pub, lang, isbn, image) VALUES (" +
 //		"'" + req.body.author + "'," +
 //		"'" + req.body.title + "'," +
@@ -70,7 +72,7 @@ app.post('/book/new', (req, res) => {
 })
 
 app.get('/list', (req, res) => {
-	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
+	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
 	var sql_command = "SELECT * FROM books"
 	var page = urlObject.query.page ? urlObject.query.page : 0;
