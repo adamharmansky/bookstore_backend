@@ -56,7 +56,7 @@ app.post('/book/new', (req, res) => {
 //		+ ")";
 
 //	console.log(sql_command);
-	console.log(JSON.serialize(req.body));
+	console.log(JSON.stringify(req.body));
 	res.send("ok vibavene.");
 	// sql_connection.query(sql_command, (err, result) => {
 	// 	try {
