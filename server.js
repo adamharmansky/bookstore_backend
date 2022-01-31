@@ -5,6 +5,7 @@ const util = require('util')
 const url = require('url')
 const fs = require('fs')
 const cors = require('cors')
+const bodyParser = require('body-parser')
 
 const page_size = 4
 
@@ -20,6 +21,10 @@ var options = {
 }
 const app = express()
 app.use(cors())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+	extended: true
+}))
 
 app.get('/book', (req, res) => {
 	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
