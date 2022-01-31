@@ -49,17 +49,17 @@ app.get('/book', (req, res) => {
 app.post('/book/new', (req, res) => {
 	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const sql_command = "INSERT INTO books (author, title, subject, keywords, desc, read_time, pages, year_pub, lang, isbn, image) VALUES (" +
-		"'" + req.body.author + "'," +
-		"'" + req.body.title + "'," +
-		"'" + req.body.subject + "'," +
-		"'" + req.body.keywords + "'," +
-		"'" + req.body.desc + "'," +
-		"'" + req.body.read_time + "'," +
-		"'" + req.body.pages + "'," +
-		      req.body.year_pub + "," +
-		"'" + req.body.lang + "'," +
-		      req.body.isbn + "," +
-		"'" + req.body.image + "'," +
+		"'"                     + ( req.body.author   ? req.body.author    : '' ) + "'," +
+		"'"                     + ( req.body.title    ? req.body.title     : '' ) + "'," +
+		"'"                     + ( req.body.subject  ? req.body.subject   : '' ) + "'," +
+		"'"                     + ( req.body.keywords ? req.body.keywords  : '' ) + "'," +
+		"'"                     + ( req.body.desc     ? req.body.desc      : '' ) + "'," +
+		"'"                     + ( req.body.read_time? req.body.read_time : '' ) + "'," +
+		"'"                     + ( req.body.pages    ? req.body.pages     : '' ) + "'," +
+		                          ( req.body.year_pub ? req.body.year_pub  : 0  ) + ","  +
+		"'"                     + ( req.body.lang     ? req.body.lang      : '' ) + "'," +
+		                          ( req.body.isbn     ? req.body.isbn      : 0  ) + ","  +
+		"'"                     + ( req.body.image    ? req.body.image     : '' ) + "'," +
 		+ ")";
 
 	console.log(sql_command);
