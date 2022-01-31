@@ -42,21 +42,21 @@ app.get('/book', (req, res) => {
 app.post('/book/new', (req, res) => {
 	res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const sql_command = "INSERT INTO books (author, title, subject, keywords, desc, read_time, pages, year_pub, lang, isbn, image) VALUES (" +
-		"'" + req.params.author + "'," +
-		"'" + req.params.title + "'," +
-		"'" + req.params.subject + "'," +
-		"'" + req.params.keywords + "'," +
-		"'" + req.params.desc + "'," +
-		"'" + req.params.read_time + "'," +
-		"'" + req.params.pages + "'," +
-		      req.params.year_pub + "," +
-		"'" + req.params.lang + "'," +
-		      req.params.isbn + "," +
-		"'" + req.params.image + "'," +
+		"'" + req.body.author + "'," +
+		"'" + req.body.title + "'," +
+		"'" + req.body.subject + "'," +
+		"'" + req.body.keywords + "'," +
+		"'" + req.body.desc + "'," +
+		"'" + req.body.read_time + "'," +
+		"'" + req.body.pages + "'," +
+		      req.body.year_pub + "," +
+		"'" + req.body.lang + "'," +
+		      req.body.isbn + "," +
+		"'" + req.body.image + "'," +
 		+ ")";
 
 	console.log(sql_command);
-	res.send(req.body);
+	res.send("ok vibavene.");
 	// sql_connection.query(sql_command, (err, result) => {
 	// 	try {
 	// 		if (err) throw 400
