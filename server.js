@@ -73,7 +73,7 @@ app.post('/book/new', (req, res) => {
 
 app.get('/list', async (req, res) => {
 	const urlObject = url.parse(req.url, true)
-	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)" + makeSearch(q)
+	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)"
 
 	const search = ''
 	if (q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'"
