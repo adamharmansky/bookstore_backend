@@ -106,7 +106,7 @@ app.get('/list', async (req, res) => {
 				let author_command = "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE"
 				for (let i = 0; i < result.length; i++) {
 					result[i].authors = []
-					author_command += " isbn=" + result[i].isbn
+					author_command += " isbn='" + result[i].isbn + "'"
 					if (i < result.length - 1) {
 						author_command += " OR"
 					}
