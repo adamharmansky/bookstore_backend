@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({
 
 app.get('/book', (req, res) => {
 	const urlObject = url.parse(req.url, true)
-	if (!urlObject.query.q) {
+	if (!urlObject.query.book) {
 		res.send(400)
 		return
 	}
