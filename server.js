@@ -44,7 +44,7 @@ app.get('/book', (req, res) => {
 			return
 		}
 		if (result.length > 0) {
-			let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + results[0].isbn
+			let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + result[0].isbn
 			result[0].authors = []
 			console.log(author_command);
 
