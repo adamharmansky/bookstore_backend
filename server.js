@@ -7,7 +7,7 @@ const fs = require('fs')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
-const page_size = 4
+const page_size = 6
 
 allowed_websites = 'https://bookstore.harmansky.xyz'
 const port = 3001
@@ -27,97 +27,116 @@ app.use(bodyParser.urlencoded({
 }))
 
 app.get('/book', (req, res) => {
-	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
 	const urlObject = url.parse(req.url, true)
-	if (!urlObject.query.book) {
-		res.send(404)
+	if (!urlObject.query.q) {
+		res.send(400)
 		return
 	}
-	const sql_command = "SELECT * FROM books WHERE isbn=" + urlObject.query.book
+
+	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id) WHERE isbn=" + urlObject.query.book
+
 	console.log(sql_command);
+
 	sql_connection.query(sql_command, (err, result) => {
-		try {
-			if (err) throw 400
-			if (result.length == 0) throw 404
-			res.send(result)
-		} catch (err) {
-			res.send(err)
+		if (err) {
+			console.log(err)
+			res.send(500)
+			return
+		}
+		if (result.length > 0) {
+			let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + results[0].isbn
+			result[0].authors = []
+			console.log(author_command);
+
+			sql_connection.query(author_command, (authorErr, authorResult) => {
+				if (authorErr) {
+					console.log(pageCountErr)
+					res.send(500)
+					return
+				}
+				for (let i = 0; i < authorResult.length; i++) {
+					result[0].authors.push(authorResult[i])
+				}
+				res.send(result[0])
+			})
+		} else {
+			res.send(404)
+			return
 		}
 	})
 })
 
 app.post('/book/new', (req, res) => {
-	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
-	const sql_command = "INSERT INTO books (author, title, subject, keywords, desc, read_time, pages, year_pub, lang, isbn, image) VALUES (" +
-		"'"                     + ( req.body.author   ? req.body.author    : '' ) + "'," +
-		"'"                     + ( req.body.title    ? req.body.title     : '' ) + "'," +
-		"'"                     + ( req.body.subject  ? req.body.subject   : '' ) + "'," +
-		"'"                     + ( req.body.keywords ? req.body.keywords  : '' ) + "'," +
-		"'"                     + ( req.body.desc     ? req.body.desc      : '' ) + "'," +
-		"'"                     + ( req.body.read_time? req.body.read_time : '' ) + "'," +
-		"'"                     + ( req.body.pages    ? req.body.pages     : '' ) + "'," +
-		                          ( req.body.year_pub ? req.body.year_pub  : 0  ) + ","  +
-		"'"                     + ( req.body.lang     ? req.body.lang      : '' ) + "'," +
-		                          ( req.body.isbn     ? req.body.isbn      : 0  ) + ","  +
-		"'"                     + ( req.body.image    ? req.body.image     : '' ) + "'," +
-		+ ")";
-
-	console.log(sql_command);
-	res.send("ok vibavene.");
-	// sql_connection.query(sql_command, (err, result) => {
-	// 	try {
-	// 		if (err) throw 400
-	// 		if (result.length == 0) throw 404
-	// 		res.send(result)
-	// 	} catch (err) {
-	// 		res.send(err)
-	// 	}
-	// })
+	console.log(req.body);
+	res.send(200);
 })
 
-app.get('/list', (req, res) => {
-	// res.setHeader('Access-Control-Allow-Origin', allowed_websites);
+app.get('/list', async (req, res) => {
 	const urlObject = url.parse(req.url, true)
-	var sql_command = "SELECT * FROM books"
+	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)" + makeSearch(q)
+
+	const search = ''
+	if (q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'"
+
+	sql_command += search
+
+	if (urlObject.query.order_by) sql_command += ' ORDER BY ' + urlObject.query.order_by
+	else                          sql_command += ' ORDER BY ' + "year_pub"
+	if (urlObject.query.order) sql_command += " " + urlObject.query.order
+	else                       sql_command += " DESC"
+
 	var page = urlObject.query.page ? urlObject.query.page : 0;
-
-	if (urlObject.query.q) {
-		sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%' OR author LIKE '%" + urlObject.query.q + "%'"
-	}
-
-	sql_command += ' ORDER BY '
-
-	if (urlObject.query.order_by) sql_command += urlObject.query.order_by
-	else                          sql_command += "year_pub"
-
-	sql_command += " "
-
-	if (urlObject.query.order) sql_command += urlObject.query.order
-	else                       sql_command += "DESC"
-
 	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
 
 	console.log(sql_command);
 
 	sql_connection.query(sql_command, (err, result) => {
 		if (err) {
-			console.log("Epic bruh moment " + err)
+			console.log(err)
 			res.send(500)
+			return
 		}
-		var sql_command = "SELECT COUNT(*) FROM books"
-		if (urlObject.query.q) {
-			sql_command += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%' OR author LIKE '%" + urlObject.query.q + "%'"
-		}
-		sql_connection.query(sql_command, (errr, resultt) => {
-			if (err) {
-				console.log("Epic bruh moment " + err)
-				res.send(500)
-			}
-			res.send({
-				books: result,
-				pageCount: Math.ceil(resultt[0]['COUNT(*)']/page_size)
+		if (result.length > 0) {
+			sql_connection.query("SELECT COUNT(*) FROM books" + search, (pageCountErr, pageCountResult) => {
+				if (pageCountErr) {
+					console.log(pageCountErr)
+					res.send(500)
+					return
+				}
+				let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE"
+				for (let i = 0; i < result.length; i++) {
+					result[i].authors = []
+					author_command += " isbn=" + results[i].isbn
+					if (i < result.length - 1) {
+						author_command += " OR"
+					}
+				}
+				console.log(author_command);
+				sql_connection.query(author_command, (authorErr, authorResult) => {
+					if (authorErr) {
+						console.log(pageCountErr)
+						res.send(500)
+						return
+					}
+					for (let i = 0; i < authorResult.length; i++) {
+						for (let j = 0; j < result.length; j++) {
+							if (result[j].isbn == authorResult[i].isbn) {
+								result[j].authors.push(authorResult[i])
+							}
+						}
+					}
+					res.send({
+						books: result,
+						pageCount: Math.ceil(pageCountResult[0]['COUNT(*)']/page_size)
+					})
+				})
 			})
-		})
+		} else {
+			res.send({
+				books: [],
+				pageCount: 0
+			})
+		}
 	})
 })
 
@@ -128,7 +147,7 @@ var server = https.createServer(options, app)
 sql_connection.connect((err) => {
 	if (err) throw err
 	console.log('Connected to SQL database')
-	sql_connection.query("USE kniznica", (err, result) => {
+	sql_connection.query("USE bookstore", (err, result) => {
 		if (err) throw err
 		console.log('Selected database: ' + JSON.stringify(result))
 	})
