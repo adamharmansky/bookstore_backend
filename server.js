@@ -103,7 +103,7 @@ app.get('/list', async (req, res) => {
 					res.send(500)
 					return
 				}
-				let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE"
+				let author_command = "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE"
 				for (let i = 0; i < result.length; i++) {
 					result[i].authors = []
 					author_command += " isbn=" + result[i].isbn
@@ -122,6 +122,7 @@ app.get('/list', async (req, res) => {
 						for (let j = 0; j < result.length; j++) {
 							if (result[j].isbn == authorResult[i].isbn) {
 								result[j].authors.push(authorResult[i])
+								delete  result[j].authors[result[j].authors.length-1].isbn
 							}
 						}
 					}
