@@ -76,7 +76,7 @@ app.get('/list', async (req, res) => {
 	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)"
 
 	const search = ''
-	if (q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'"
+	if (urlObject.query.q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'"
 
 	sql_command += search
 
