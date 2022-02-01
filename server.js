@@ -97,7 +97,7 @@ app.get('/list', async (req, res) => {
 			return
 		}
 		if (result.length > 0) {
-			sql_connection.query("SELECT COUNT(isbn) FROM books" + search, (pageCountErr, pageCountResult) => {
+			sql_connection.query("SELECT COUNT(*) FROM books" + search, (pageCountErr, pageCountResult) => {
 				if (pageCountErr) {
 					console.log(pageCountErr)
 					res.send(500)
