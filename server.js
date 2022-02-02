@@ -48,7 +48,6 @@ app.get('/book', (req, res) => {
 		}
 		if (result.length > 0) {
 			let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + result[0].isbn;
-			result[0].authors = [];
 			console.log(author_command);
 
 			sql_connection.query(author_command, (authorErr, authorResult) => {
@@ -57,9 +56,7 @@ app.get('/book', (req, res) => {
 					res.send(500);
 					return;
 				}
-				for (let i = 0; i < authorResult.length; i++) {
-					result[0].authors.push(authorResult[i]);
-				}
+				result[0].authors = authorResult;
 				res.send(result[0]);
 			});
 		} else {
@@ -137,14 +134,9 @@ app.get('/list', async (req, res) => {
 					res.send(500);
 					return;
 				}
-				let author_command = "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE";
-				for (let i = 0; i < result.length; i++) {
-					result[i].authors = [];
-					author_command += " isbn='" + result[i].isbn + "'";
-					if (i < result.length - 1) {
-						author_command += " OR";
-					}
-				}
+				let author_command = result.reduce((total, book) => {
+					return " isbn='" + book.isbn + "'" + (i < result.length - 1 ? " OR" : "");
+				} , "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE");
 				console.log(author_command);
 				sql_connection.query(author_command, (authorErr, authorResult) => {
 					if (authorErr) {
