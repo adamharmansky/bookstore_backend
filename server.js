@@ -26,6 +26,11 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }))
 
+app.post('/book/new', (req, res) => {
+	console.log(req.body);
+	res.send(200);
+})
+
 app.get('/book', (req, res) => {
 	const urlObject = url.parse(req.url, true)
 	if (!urlObject.query.book) {
@@ -66,9 +71,40 @@ app.get('/book', (req, res) => {
 	})
 })
 
-app.post('/book/new', (req, res) => {
-	console.log(req.body);
-	res.send(200);
+app.get('/author/list', (req, res) => {
+	const urlObject = url.parse(req.url, true)
+	const search = ''
+	if (urlObject.query.q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'"
+	var sql_command = "SELECT * FROM authors" + search
+	var page = urlObject.query.page ? urlObject.query.page : 0;
+	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
+
+	console.log(sql_command);
+
+	sql_connection.query(sql_command, (err, result) => {
+		if (err) {
+			console.log(err)
+			res.send(500)
+			return
+		}
+		if (result.length > 0) {
+			size_command = "SELECT COUNT(*) FROM authors" + search
+			sql_connection.query(sql_command, (err, size_result) => {
+				if (err) {
+					console.log(err)
+					res.send(500)
+					return
+				}
+				res.send({
+					authors: result,
+					page_count: Math.ceil(size_result[0]/page_size)
+				})
+			})
+		} else {
+			res.send(404)
+			return
+		}
+	})
 })
 
 app.get('/list', async (req, res) => {
