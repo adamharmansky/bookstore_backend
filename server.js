@@ -89,15 +89,15 @@ app.get('/author/list', (req, res) => {
 		}
 		if (result.length > 0) {
 			size_command = "SELECT COUNT(*) FROM authors" + search
-			sql_connection.query(sql_command, (err, size_result) => {
-				if (err) {
-					console.log(err)
+			sql_connection.query(sql_command, (size_err, size_result) => {
+				if (size_err) {
+					console.log(size_err)
 					res.send(500)
 					return
 				}
 				res.send({
 					authors: result,
-					pagePage: Math.ceil(size_result[0]['COUNT(*)']/page_size)
+					pageCount: Math.ceil(size_result[0]['COUNT(*)']/page_size)
 				})
 			})
 		} else {
