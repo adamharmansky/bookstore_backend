@@ -140,7 +140,7 @@ app.get('/list', async (req, res) => {
 				console.log(author_command);
 				sql_connection.query(author_command, (authorErr, authorResult) => {
 					if (authorErr) {
-						console.log(pageCountErr);
+						console.log(authorErr);
 						res.send(500);
 						return;
 					}
