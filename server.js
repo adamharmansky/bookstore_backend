@@ -134,7 +134,7 @@ app.get('/list', async (req, res) => {
 					res.send(500);
 					return;
 				}
-				let author_command = result.reduce((total, book) => {
+				let author_command = result.reduce((total, book, i) => {
 					return " isbn='" + book.isbn + "'" + (i < result.length - 1 ? " OR" : "");
 				} , "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE");
 				console.log(author_command);
