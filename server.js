@@ -89,7 +89,7 @@ app.get('/author/list', (req, res) => {
 		}
 		if (result.length > 0) {
 			size_command = "SELECT COUNT(*) FROM authors" + search
-			sql_connection.query(sql_command, (size_err, size_result) => {
+			sql_connection.query(size_command, (size_err, size_result) => {
 				if (size_err) {
 					console.log(size_err)
 					res.send(500)
