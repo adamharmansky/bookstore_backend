@@ -73,7 +73,7 @@ app.get('/book', (req, res) => {
 
 app.get('/author/list', (req, res) => {
 	const urlObject = url.parse(req.url, true)
-	const search = ''
+	var search = ''
 	if (urlObject.query.q) search += " WHERE author_name LIKE '%" + urlObject.query.q + "%'"
 	var sql_command = "SELECT * FROM authors" + search
 	var page = urlObject.query.page ? urlObject.query.page : 0;
