@@ -106,8 +106,7 @@ app.get('/list', async (req, res) => {
 	const urlObject = url.parse(req.url, true);
 	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)";
 
-	var search = '';
-	if (urlObject.query.q) search += " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'";
+	var search = urlObject.query.q ? " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'" : '';
 
 	sql_command += search;
 
@@ -134,9 +133,9 @@ app.get('/list', async (req, res) => {
 					res.send(500);
 					return;
 				}
-				let author_command = result.reduce((total, book, i) => {
-					return " isbn='" + book.isbn + "'" + (i < result.length - 1 ? " OR" : "");
-				} , "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE");
+				let author_command = "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE" + result.map((book) => {
+					return " isbn='" + book.isbn + "'";
+				}).join(" OR");
 				console.log(author_command);
 				sql_connection.query(author_command, (authorErr, authorResult) => {
 					if (authorErr) {
