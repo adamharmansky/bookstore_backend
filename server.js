@@ -8,17 +8,16 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const page_size = 6;
-
-allowed_websites = 'https://bookstore.harmansky.xyz';
 const port = 3001;
 
-var sql_connection = mysql.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'root' });
+var sql = mysql.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'root' });
 var key = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/privkey.pem');
 var cert = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/cert.pem');
 var options = {
 	key: key,
 	cert: cert
 };
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -40,7 +39,7 @@ app.get('/book', (req, res) => {
 
 	console.log(sql_command);
 
-	sql_connection.query(sql_command, (err, result) => {
+	sql.query(sql_command, (err, result) => {
 		if (err) {
 			console.log(err);
 			res.send(500);
@@ -50,7 +49,7 @@ app.get('/book', (req, res) => {
 			let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + result[0].isbn;
 			console.log(author_command);
 
-			sql_connection.query(author_command, (authorErr, authorResult) => {
+			sql.query(author_command, (authorErr, authorResult) => {
 				if (authorErr) {
 					console.log(pageCountErr);
 					res.send(500);
@@ -84,14 +83,14 @@ app.get('/list', async (req, res) => {
 
 	console.log(sql_command);
 
-	sql_connection.query(sql_command, (err, result) => {
+	sql.query(sql_command, (err, result) => {
 		if (err) {
 			console.log(err);
 			res.send(500);
 			return;
 		}
 		if (result.length > 0) {
-			sql_connection.query("SELECT COUNT(*) FROM books" + search, (pageCountErr, pageCountResult) => {
+			sql.query("SELECT COUNT(*) FROM books" + search, (pageCountErr, pageCountResult) => {
 				if (pageCountErr) {
 					console.log(pageCountErr);
 					res.send(500);
@@ -101,7 +100,7 @@ app.get('/list', async (req, res) => {
 					return " isbn='" + book.isbn + "'";
 				}).join(" OR");
 				console.log(author_command);
-				sql_connection.query(author_command, (authorErr, authorResult) => {
+				sql.query(author_command, (authorErr, authorResult) => {
 					if (authorErr) {
 						console.log(authorErr);
 						res.send(500);
@@ -135,7 +134,7 @@ app.get('/author/list', (req, res) => {
 
 	console.log(sql_command);
 
-	sql_connection.query(sql_command, (err, result) => {
+	sql.query(sql_command, (err, result) => {
 		if (err) {
 			console.log(err);
 			res.send(500);
@@ -143,7 +142,7 @@ app.get('/author/list', (req, res) => {
 		}
 		if (result.length > 0) {
 			size_command = "SELECT COUNT(*) FROM authors" + search;
-			sql_connection.query(size_command, (size_err, size_result) => {
+			sql.query(size_command, (size_err, size_result) => {
 				if (size_err) {
 					console.log(size_err);
 					res.send(500);
@@ -169,7 +168,7 @@ app.get('/author', (req, res) => {
 
 	console.log(sql_command);
 
-	sql_connection.query(sql_command, (err, result) => {
+	sql.query(sql_command, (err, result) => {
 		if (err) {
 			console.log(err);
 			res.send(500);
@@ -177,7 +176,7 @@ app.get('/author', (req, res) => {
 		}
 		if (result.length > 0) {
 			const book_command = "SELECT * FROM projects LEFT JOIN books USING (isbn)" + search;
-			sql_connection.query(book_command, (book_err, books) => {
+			sql.query(book_command, (book_err, books) => {
 				if (book_err) {
 					console.log(book_err);
 					res.send(500);
@@ -197,10 +196,10 @@ var server = https.createServer(options, app);
 
 // SQL connection
 // requires unix socket authentication - script MUST be run as root!!!!
-sql_connection.connect((err) => {
+sql.connect((err) => {
 	if (err) throw err;
 	console.log('Connected to SQL database');
-	sql_connection.query("USE bookstore", (err, result) => {
+	sql.query("USE bookstore", (err, result) => {
 		if (err) throw err;
 		console.log('Selected database: ' + JSON.stringify(result));
 	});
