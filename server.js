@@ -184,7 +184,7 @@ app.get('/author', (req, res) => {
 					return;
 				}
 				result[0].books = books;
-				res.send(result)
+				res.send(result[0])
 			})
 		} else {
 			res.send(404);
