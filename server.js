@@ -227,7 +227,7 @@ app.get('/subject', (req, res) => {
             res.send(404);
             return;
         }
-        res.send(result);
+        res.send(result[0]);
     });
 });
 
