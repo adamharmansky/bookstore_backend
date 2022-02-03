@@ -186,8 +186,6 @@ app.get('/author', (req, res) => {
 				result[0].books = books;
 				res.send(result)
 			})
-			result[0]
-			res.send(result[0]);
 		} else {
 			res.send(404);
 			return;
