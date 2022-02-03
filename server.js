@@ -19,25 +19,27 @@ var options = {
 	key: key,
 	cert: cert
 };
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.post('/book/new', (req, res) => {
+// Incomplete
+app.post('/book/new', (req, res) => { 
 	console.log(req.body);
 	res.send(200);
 });
 
+// Api for getting info about 1 book
 app.get('/book', (req, res) => {
 	const urlObject = url.parse(req.url, true);
-	if (!urlObject.query.book) {
+	if (!urlObject.query.book) { // '?book=' is empty
 		res.send(400);
 		return;
 	}
 
 	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id) WHERE isbn=" + urlObject.query.book;
-
 	console.log(sql_command);
 
 	sql_connection.query(sql_command, (err, result) => {
@@ -66,24 +68,28 @@ app.get('/book', (req, res) => {
 	});
 });
 
+// Api for getting info about the list of books - in multiple pages
 app.get('/list', async (req, res) => {
 	const urlObject = url.parse(req.url, true);
+
+    // SQL command for searching
 	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)";
-
-	var search = urlObject.query.q ? " WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'" : '';
-
+	var search = (urlObject.query.q) ? (" WHERE title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%'") : '';
 	sql_command += search;
 
+    // Ordering of the list
 	if (urlObject.query.order_by) sql_command += ' ORDER BY ' + urlObject.query.order_by;
 	else                          sql_command += ' ORDER BY ' + "year_pub";
 	if (urlObject.query.order) sql_command += " " + urlObject.query.order;
 	else                       sql_command += " DESC";
 
+    // Pagination - using LIMIT to chop up list into pages
 	var page = urlObject.query.page ? urlObject.query.page : 0;
 	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
 
 	console.log(sql_command);
 
+    // Querying the SQL database
 	sql_connection.query(sql_command, (err, result) => {
 		if (err) {
 			console.log(err);
@@ -126,9 +132,12 @@ app.get('/list', async (req, res) => {
 	});
 });
 
+// Api for getting the list of authors
 app.get('/author/list', (req, res) => {
 	const urlObject = url.parse(req.url, true);
-	const search = urlObject.query.q ? " WHERE author_name LIKE '%" + urlObject.query.q + "%'" : "";
+
+    // Query for SQL - including search and pagination
+	const search = (urlObject.query.q) ? (" WHERE author_name LIKE '%" + urlObject.query.q + "%'") : "";
 	var sql_command = "SELECT * FROM authors" + search;
 	const page = urlObject.query.page ? urlObject.query.page : 0;
 	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
@@ -142,6 +151,7 @@ app.get('/author/list', (req, res) => {
 			return;
 		}
 		if (result.length > 0) {
+            // Getting the page size, TODO: better?
 			size_command = "SELECT COUNT(*) FROM authors" + search;
 			sql_connection.query(size_command, (size_err, size_result) => {
 				if (size_err) {
@@ -163,9 +173,10 @@ app.get('/author/list', (req, res) => {
 
 app.get('/author', (req, res) => {
 	const urlObject = url.parse(req.url, true);
+
+    // TODO: maybe return 404 if urlObject.query.author is null
 	const search = urlObject.query.author ? " WHERE author_id='" + urlObject.query.author + "'" : "";
 	var sql_command = "SELECT * FROM authors" + search;
-	const page = urlObject.query.page ? urlObject.query.page : 0;
 
 	console.log(sql_command);
 
@@ -176,6 +187,7 @@ app.get('/author', (req, res) => {
 			return;
 		}
 		if (result.length > 0) {
+            // Getting the authors books 
 			const book_command = "SELECT * FROM projects LEFT JOIN books USING (isbn)" + search;
 			sql_connection.query(book_command, (book_err, books) => {
 				if (book_err) {
