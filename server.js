@@ -66,42 +66,6 @@ app.get('/book', (req, res) => {
 	});
 });
 
-app.get('/author/list', (req, res) => {
-	const urlObject = url.parse(req.url, true);
-	var search = '';
-	if (urlObject.query.q) search += " WHERE author_name LIKE '%" + urlObject.query.q + "%'";
-	var sql_command = "SELECT * FROM authors" + search;
-	var page = urlObject.query.page ? urlObject.query.page : 0;
-	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
-
-	console.log(sql_command);
-
-	sql_connection.query(sql_command, (err, result) => {
-		if (err) {
-			console.log(err);
-			res.send(500);
-			return;
-		}
-		if (result.length > 0) {
-			size_command = "SELECT COUNT(*) FROM authors" + search;
-			sql_connection.query(size_command, (size_err, size_result) => {
-				if (size_err) {
-					console.log(size_err);
-					res.send(500);
-					return;
-				}
-				res.send({
-					authors: result,
-					pageCount: Math.ceil(size_result[0]['COUNT(*)']/page_size)
-				});
-			});
-		} else {
-			res.send(404);
-			return;
-		}
-	});
-});
-
 app.get('/list', async (req, res) => {
 	const urlObject = url.parse(req.url, true);
 	var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)";
@@ -158,6 +122,75 @@ app.get('/list', async (req, res) => {
 				books: [],
 				pageCount: 0
 			});
+		}
+	});
+});
+
+app.get('/author/list', (req, res) => {
+	const urlObject = url.parse(req.url, true);
+	const search = urlObject.query.q ? " WHERE author_name LIKE '%" + urlObject.query.q + "%'" : "";
+	var sql_command = "SELECT * FROM authors" + search;
+	const page = urlObject.query.page ? urlObject.query.page : 0;
+	sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
+
+	console.log(sql_command);
+
+	sql_connection.query(sql_command, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.send(500);
+			return;
+		}
+		if (result.length > 0) {
+			size_command = "SELECT COUNT(*) FROM authors" + search;
+			sql_connection.query(size_command, (size_err, size_result) => {
+				if (size_err) {
+					console.log(size_err);
+					res.send(500);
+					return;
+				}
+				res.send({
+					authors: result,
+					pageCount: Math.ceil(size_result[0]['COUNT(*)']/page_size)
+				});
+			});
+		} else {
+			res.send(404);
+			return;
+		}
+	});
+});
+
+app.get('/author', (req, res) => {
+	const urlObject = url.parse(req.url, true);
+	const search = urlObject.query.author ? " WHERE author_id='" + urlObject.query.author + "'" : "";
+	var sql_command = "SELECT * FROM authors" + search;
+	const page = urlObject.query.page ? urlObject.query.page : 0;
+
+	console.log(sql_command);
+
+	sql_connection.query(sql_command, (err, result) => {
+		if (err) {
+			console.log(err);
+			res.send(500);
+			return;
+		}
+		if (result.length > 0) {
+			const book_command = "SELECT * FROM projects LEFT JOIN books USING (isbn)" + search;
+			sql_connection.query(book_command, (book_err, books) => {
+				if (book_err) {
+					console.log(book_err);
+					res.send(500);
+					return;
+				}
+				result[0].books = books;
+				res.send(result)
+			})
+			result[0]
+			res.send(result[0]);
+		} else {
+			res.send(404);
+			return;
 		}
 	});
 });
