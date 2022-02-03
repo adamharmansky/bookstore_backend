@@ -200,6 +200,37 @@ app.get('/author', (req, res) => {
     });
 });
 
+app.get('/subject/list', (req, res) => {
+    const sql_command = 'SELECT * FROM subjects';
+    sql.query(sql_command, (err, result) => {
+        if (err) {
+            res.send(500);
+            return;
+        }
+        res.send(result);
+    });
+});
+
+app.get('/subject', (req, res) => {
+    const urlObject = url.parse(req.url, true);
+    if (!urlObject.query.subject) {
+        res.sent(400);
+        return;
+    }
+    const sql_command = 'SELECT * FROM subjects WHERE subject_id=' + urlObject.query.subject;
+    sql.query(sql_command, (err, result) => {
+        if (err) {
+            res.send(500);
+            return;
+        }
+        if (result.length == 0) {
+            res.send(404);
+            return;
+        }
+        res.send(result);
+    });
+});
+
 var server = https.createServer(options, app);
 
 // SQL connection
