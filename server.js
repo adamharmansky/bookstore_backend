@@ -60,7 +60,7 @@ app.post('/book/new', (req, res) => {
                 return;
             }
             author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE `author_name`=?";
-            author_data = [req.body.authors]
+            author_data = [req.body.authors.map((author)=>[author])]
             console.log(author_command);
             console.log(author_data);
             sql.query(author_command, author_data, (author_err, author_result)=>{
