@@ -180,6 +180,18 @@ app.get('/author/short', (req, res) => {
     });
 });
 
+// quick list of languages to get their names (for AddBook, etc.)
+app.get('/lang/short', (req, res) => {
+    sql.query("SELECT * FROM languages", (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send(500);
+            return;
+        }
+        res.send(result);
+    });
+});
+
 app.get('/author', (req, res) => {
     const urlObject = url.parse(req.url, true);
 
