@@ -12,6 +12,7 @@ const page_size = 6;
 const port = 3001;
 
 const filePath='/web/bookstore/files/';
+const fileUrl='https://bookstore.harmansky.xyz/pub/';
 var sql = mysql.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'root' });
 var key = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/privkey.pem');
 var cert = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/cert.pem');
@@ -47,7 +48,29 @@ app.post('/book/new', (req, res) => {
             console.log(err);
             res.send(500);
         }
-        res.send(200);
+        add_command = "INSERT IGNORE INTO authors (`author_name`) VALUES ?" + sql.escape(i);
+        add_data = [req.body.authors.map((author) => [author])]
+        console.log(add_command);
+        console.log(add_data);
+        sql.query(add_command, add_data, (add_err, add_result) => {
+            if (add_err) {
+                console.log(add_err);
+                res.send(500);
+                return;
+            }
+            author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE `author_name`=?";
+            author_data = [req.body.authors]
+            console.log(author_command);
+            console.log(author_data);
+            sql.query(author_command, (author_err, author_result)=>{
+                if (author_err) {
+                    console.log(author_err);
+                    res.send(500);
+                    return;
+                }
+                res.send(200);
+            });
+        });
     });
 });
 
