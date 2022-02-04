@@ -6,10 +6,12 @@ const url = require('url');
 const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
 const page_size = 6;
 const port = 3001;
 
+const filePath='/web/bookstore/files/';
 var sql = mysql.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'root' });
 var key = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/privkey.pem');
 var cert = fs.readFileSync('/etc/letsencrypt/live/bookstore.harmansky.xyz/cert.pem');
@@ -22,6 +24,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(fileUpload());
 
 // Incomplete
 app.post('/book/new', (req, res) => { 
@@ -31,8 +34,7 @@ app.post('/book/new', (req, res) => {
 });
 
 // Api for getting info about 1 book
-app.get('/book', (req, res) => {
-    const urlObject = url.parse(req.url, true);
+app.get('/book', (req, res) => { const urlObject = url.parse(req.url, true);
     if (!urlObject.query.book) { // '?book=' is empty
         res.send(400);
         return;
@@ -254,6 +256,21 @@ app.get('/subject', (req, res) => {
             return;
         }
         res.send(result[0]);
+    });
+});
+
+app.post('/image/new', (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        res.send(400);
+    }
+    console.log("Uploading file into " + filePath + req.files.image.name);
+    req.files.image.mv(filePath + req.files.image.name, (err) => {
+        if (err) {
+            res.send(500);
+            console.log(err);
+            return;
+        }
+        res.send(200);
     });
 });
 
