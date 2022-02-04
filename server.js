@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.post('/book/new', (req, res) => { 
     console.log(req.body);
     res.send(200);
+    // TODO: check for matchong ISBN when adding a book
 });
 
 // Api for getting info about 1 book
@@ -129,7 +130,7 @@ app.get('/list', async (req, res) => {
     });
 });
 
-// Api for getting the list of authors
+// list of authors, with their books
 app.get('/author/list', (req, res) => {
     const urlObject = url.parse(req.url, true);
 
@@ -147,6 +148,7 @@ app.get('/author/list', (req, res) => {
             return;
         }
         if (result.length > 0) {
+            // calculate number of pages from total number of elements
             size_command = "SELECT COUNT(*) FROM authors" + search;
             sql.query(size_command, (size_err, size_result) => {
                 if (size_err) {
@@ -163,6 +165,18 @@ app.get('/author/list', (req, res) => {
             res.send(404);
             return;
         }
+    });
+});
+
+// quick list of authors to get their names (for AddBook, etc.)
+app.get('/author/short', (req, res) => {
+    sql.query("SELECT * FROM authors", (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send(500);
+            return;
+        }
+        res.send(result);
     });
 });
 
