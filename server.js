@@ -80,7 +80,7 @@ app.get('/book', (req, res) => { const urlObject = url.parse(req.url, true);
         return;
     }
 
-    var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id) WHERE isbn=" + urlObject.query.book;
+    var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id) WHERE isbn=" + sql.escape(urlObject.query.book);
     console.log(sql_command);
 
     sql.query(sql_command, (err, result) => {
