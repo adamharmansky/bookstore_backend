@@ -30,17 +30,17 @@ app.use(fileUpload());
 app.post('/book/new', (req, res) => {
     console.log(req.body);
     var sql_command = "INSERT INTO books (isbn, title, subject_id, keywords, desc, read_time, pages, year_pub, lang_id, image, content) VALUES (";
-    sql_command += "'" + sql.escape(req.body.isbn) + "',";
-    sql_command += "'" + sql.escape(req.body.title) + "',";
-    sql_command += ""  + sql.escape(req.body.subject) + ",";
-    sql_command += "'" + sql.escape(req.body.keywords) + "',";
-    sql_command += "'" + sql.escape(req.body.desc) + "',";
-    sql_command += ""  + sql.escape(req.body.read_time) + ",";
-    sql_command += ""  + sql.escape(req.body.pages) + ",";
-    sql_command += ""  + sql.escape(req.body.year_pub) + ",";
-    sql_command += ""  + sql.escape(req.body.lang) + ",";
-    sql_command += "'" + sql.escape(req.body.image) + "',";
-    sql_command += "'" + sql.escape(req.body.content) + "')";
+    sql_command += sql.escape(req.body.isbn)      + ",";
+    sql_command += sql.escape(req.body.title)     + ",";
+    sql_command += sql.escape(req.body.subject)   + ",";
+    sql_command += sql.escape(req.body.keywords)  + ",";
+    sql_command += sql.escape(req.body.desc)      + ",";
+    sql_command += sql.escape(req.body.read_time) + ",";
+    sql_command += sql.escape(req.body.pages)     + ",";
+    sql_command += sql.escape(req.body.year_pub)  + ",";
+    sql_command += sql.escape(req.body.lang)      + ",";
+    sql_command += sql.escape(req.body.image)     + ",";
+    sql_command += sql.escape(req.body.content)   + ")";
     console.log(sql_command);
     sql.query(sql_command, (err, result) => {
         if (err) {
