@@ -90,7 +90,7 @@ app.get('/book', (req, res) => { const urlObject = url.parse(req.url, true);
             return;
         }
         if (result.length > 0) {
-            let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + result[0].isbn;
+            let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + sql.escape(result[0].isbn);
             console.log(author_command);
 
             sql.query(author_command, (authorErr, authorResult) => {
