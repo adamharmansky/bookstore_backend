@@ -48,8 +48,8 @@ app.post('/book/new', (req, res) => {
             console.log(err);
             res.send(500);
         }
-        add_command = "INSERT IGNORE INTO authors (`author_name`) VALUES ?" + sql.escape(i);
-        add_data = [req.body.authors.map((author) => [author])]
+        add_command = "INSERT IGNORE INTO authors (`author_name`) VALUES ?";
+        add_data = [req.body.authors.map((author) => [author])];
         console.log(add_command);
         console.log(add_data);
         sql.query(add_command, add_data, (add_err, add_result) => {
