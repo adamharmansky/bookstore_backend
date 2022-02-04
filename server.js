@@ -47,6 +47,7 @@ app.post('/book/new', (req, res) => {
         if (err) {
             console.log(err);
             res.send(500);
+            return;
         }
         add_command = "INSERT IGNORE INTO authors (`author_name`) VALUES ?";
         add_data = [req.body.authors.map((author) => [author])];
