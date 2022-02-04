@@ -41,6 +41,7 @@ app.post('/book/new', (req, res) => {
     sql_command += ""  + req.body.lang + ",";
     sql_command += "'" + req.body.image + "',";
     sql_command += "'" + req.body.content + "')";
+    console.log(sql_command);
     sql.query(sql_command, (err, result) => {
         if (err) {
             console.log(err);
