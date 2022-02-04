@@ -27,10 +27,27 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
 
 // Incomplete
-app.post('/book/new', (req, res) => { 
+app.post('/book/new', (req, res) => {
     console.log(req.body);
-    res.send(200);
-    // TODO: check for matchong ISBN when adding a book
+    var sql_command = "INSERT INTO books (isbn, title, subject_id, keywords, desc, read_time, pages, year_pub, lang_id, image, content) VALUES (";
+    sql_command += "'" + req.body.isbn + "',";
+    sql_command += "'" + req.body.title + "',";
+    sql_command += ""  + req.body.subject + ",";
+    sql_command += "'" + req.body.keywords + "',";
+    sql_command += "'" + req.body.desc + "',";
+    sql_command += ""  + req.body.read_time + ",";
+    sql_command += ""  + req.body.pages + ",";
+    sql_command += ""  + req.body.year_pub + ",";
+    sql_command += ""  + req.body.lang + ",";
+    sql_command += "'" + req.body.image + "',";
+    sql_command += "'" + req.body.content + "')";
+    sql.query(sql_command, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send(500);
+        }
+        res.send(200);
+    });
 });
 
 // Api for getting info about 1 book
@@ -258,6 +275,8 @@ app.get('/subject', (req, res) => {
         res.send(result[0]);
     });
 });
+
+// TODO: password protection
 
 app.post('/image/new', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
