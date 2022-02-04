@@ -117,7 +117,7 @@ app.get('/list', async (req, res) => {
     var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)";
     var search = (urlObject.query.q) ? (" WHERE (title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%')") : '';
     if (urlObject.query.subject) {
-        search += (urlObject.query.q ? "AND" : "WHERE") + " subject_id=" + sql.escape(urlObject.query.subject);
+        search += (urlObject.query.q ? "AND" : " WHERE") + " subject_id=" + sql.escape(urlObject.query.subject);
     }
     sql_command += search;
 
