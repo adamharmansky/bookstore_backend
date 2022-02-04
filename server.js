@@ -59,7 +59,7 @@ app.post('/book/new', (req, res) => {
                 res.send(500);
                 return;
             }
-            author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE " + req.body.authors.map((author)=>("`author_name`=" + sql.escape(author))).join(" OR");
+            author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE" + req.body.authors.map((author)=>(" `author_name`=" + sql.escape(author))).join(" OR");
             console.log(author_command);
             sql.query(author_command, (author_err, author_result)=>{
                 if (author_err) {
