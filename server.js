@@ -63,7 +63,7 @@ app.post('/book/new', (req, res) => {
             author_data = [req.body.authors]
             console.log(author_command);
             console.log(author_data);
-            sql.query(author_command, (author_err, author_result)=>{
+            sql.query(author_command, author_data, (author_err, author_result)=>{
                 if (author_err) {
                     console.log(author_err);
                     res.send(500);
