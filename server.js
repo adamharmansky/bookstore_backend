@@ -29,7 +29,7 @@ app.use(fileUpload());
 // Incomplete
 app.post('/book/new', (req, res) => {
     console.log(req.body);
-    var sql_command = "INSERT INTO books (isbn, title, subject_id, keywords, desc, read_time, pages, year_pub, lang_id, image, content) VALUES (";
+    var sql_command = "INSERT INTO books (`isbn`, `title`, `subject_id`, `keywords`, `desc`, `read_time`, `pages`, `year_pub`, `lang_id`, `image`, `content`) VALUES (";
     sql_command += sql.escape(req.body.isbn)      + ", ";
     sql_command += sql.escape(req.body.title)     + ", ";
     sql_command += sql.escape(req.body.subject)   + ", ";
