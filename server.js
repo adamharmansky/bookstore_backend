@@ -8,6 +8,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 
 const page_size = 6;
 const port = 3001;
@@ -78,16 +79,25 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
+app.use(cookieParser());
 
 const keys = [];
 
 app.post('/login', (req, res) => {
     let key = crypto.randomBytes(48).toString('base64');
-    keys.push({
-        key: key,
-        exp_time: Date.now() + default_exp_time
+    let sql_command = 'SELECT COUNT(*) FROM users WHERE username=' + sql.escape(req.body.username) + ' AND password=SHA1(' + sql.escape(req.body.password) + ');';
+    sql.query(sql_command, (err, result)=> {
+        if (result.length > 0) {
+            keys.push({
+                key: key,
+                exp_time: Date.now() + default_exp_time
+            });
+            res.cookie('session_key', key, {maxAge: 86400});
+            res.send(200);
+        } else {
+            res.send(401);
+        }
     });
-    res.send(key);
 });
 
 // Incomplete
