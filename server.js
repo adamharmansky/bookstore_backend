@@ -86,6 +86,7 @@ const keys = [];
 app.post('/login', (req, res) => {
     let key = crypto.randomBytes(48).toString('base64');
     let sql_command = 'SELECT COUNT(*) FROM users WHERE username=' + sql.escape(req.body.username) + ' AND password=SHA1(' + sql.escape(req.body.password) + ');';
+    console.log(sql_command);
     sql.query(sql_command, (err, result)=> {
         if (err) {
             console.log(err);
