@@ -77,6 +77,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
 
+app.post('/login', (req, res) => {
+    console.log(req.body);
+});
+
 // Incomplete
 app.post('/book/new', (req, res) => {
     console.log(req.body);
