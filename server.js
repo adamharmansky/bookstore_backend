@@ -108,7 +108,7 @@ app.post('/login', (req, res) => {
 
 app.post('/verifykey', (req, res) => {
     console.log(req.body.key);
-    if (keys.includes(req.body.key.toString('base64'))) res.send(200);
+    if (keys.includes(req.body.key.toString('base64').trim())) res.send(200);
     else res.send(401);
 });
 
