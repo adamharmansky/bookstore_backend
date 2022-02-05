@@ -21,6 +21,56 @@ var options = {
     cert: cert
 };
 
+
+/*
+    User authentication
+
+    /admin/login {
+        req {
+            password: {password} // atleast 14 char (+num,+znaky)
+        }
+        
+        // res
+        login success {
+            success: true // frontend redirect to 
+            key: {auth_key} // stored in cookies (should be very long)
+        }
+
+        login fail {
+            success: false
+            tries_left: {tries_left} // stop checking after ip sends too many
+        }
+    }
+
+    /addbook {
+        GET req {
+            key: {auth_key} // get from cookies
+        }
+
+        // GET res
+        success {
+            success: true // front -> show ui
+        }
+        fail {
+            success: false // front -> redir to login page
+        }
+
+        
+        POST req {
+            key: {auth_key} // get from cookies
+            data: {data}
+        }
+
+        // POST res
+        success {
+            success: true // front --> display something green, "kniha pridaná" and clear ui
+        }
+        fail {
+            success: false // front --> display something red, "kniha nepridaná" and clear ui
+        }
+    }
+*/
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
