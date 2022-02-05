@@ -91,6 +91,7 @@ app.post('/login', (req, res) => {
             res.send(500);
             return;
         }
+        console.log(result);
         if (result['COUNT(*)'] > 0) {
             let key = crypto.randomBytes(48).toString('base64');
             keys.push({
