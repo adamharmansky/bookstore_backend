@@ -107,7 +107,7 @@ app.post('/login', (req, res) => {
 
 
 app.post('/verifykey', (req, res) => {
-    console.log(res.body.key);
+    console.log(req.body.key);
     if (keys.includes(req.body.key)) res.send(200);
     else res.send(401);
 });
