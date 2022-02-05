@@ -107,9 +107,13 @@ app.post('/login', (req, res) => {
 
 
 app.post('/verifykey', (req, res) => {
-    console.log(req.body.key);
-    if (keys.includes(req.body.key.toString('base64').trim())) res.send(200);
-    else res.send(401);
+    for (let i = 0; i < keys.length; i++) {
+        if (keys[i].key === req.body.key) {
+            res.send(200);
+            return;
+        }
+    }
+    res.send(401);
 });
 
 
