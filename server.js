@@ -105,6 +105,13 @@ app.post('/login', (req, res) => {
     });
 });
 
+
+app.post('/verifykey', (req, res) => {
+    if (keys.includes(req.body.key)) res.send(200);
+    else res.send(401);
+});
+
+
 // Incomplete
 app.post('/book/new', (req, res) => {
     console.log(req.body);
