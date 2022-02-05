@@ -7,9 +7,11 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const crypto = require('crypto');
 
 const page_size = 6;
 const port = 3001;
+const default_exp_time = 3600;
 
 const filePath='/web/bookstore/files/';
 const fileUrl='https://bookstore.harmansky.xyz/pub/';
@@ -77,8 +79,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
 
+const keys = [];
+
 app.post('/login', (req, res) => {
-    console.log(req.body);
+    let key = crypto.randomBytes(48).toString('base64');
+    keys.push({
+        key: key,
+        exp_time: Date.now() + default_exp_time
+    });
+    res.send(key);
 });
 
 // Incomplete
