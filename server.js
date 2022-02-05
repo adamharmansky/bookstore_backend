@@ -92,7 +92,7 @@ app.post('/login', (req, res) => {
                 key: key,
                 exp_time: Date.now() + default_exp_time
             });
-            res.cookie('session_key', key, {maxAge: 86400});
+            res.cookie('session_key', key, {maxAge: 86400, sameSite: true});
             res.send(200);
         } else {
             res.send(401);
