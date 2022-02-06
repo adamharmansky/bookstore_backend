@@ -35,14 +35,19 @@ app.use(cookieParser());
 var keys = [];
 
 function verify_key(key) {
+    let verified = false;
     for (let i = 0; i < keys.length; i++) {
-        if (keys[i].exp_time > Date.now()) {
-            keys.splice(i--);
-            continue;
+        if (keys[i].key === key) {
+            if (keys[i].exp_time > Date.now()) {
+                keys.splice(i);
+                verified = false;
+                break;
+            }
+            verified = true;
+            break;
         }
-        if (keys[i].key === key)
-            return true;
     }
+    console.log("key " + key + (verified ? " " : " not ") + "allowed");
     return false;
 }
 
@@ -69,9 +74,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/verifykey', (req, res) => {
-    let verified = verify_key(req.body.key);
-    console.log("key " + req.body.key + (verified ? " " : " not ") + "allowed");
-    res.send(verified ? 200 : 401);
+    res.send(verify_key(req.body.key) ? 200 : 401);
 });
 
 // Incomplete
@@ -358,6 +361,10 @@ app.get('/subject', (req, res) => {
 // TODO: password protection
 
 app.post('/image/new', (req, res) => {
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
     if (!req.files || Object.keys(req.files).length === 0) {
         res.send(400);
     }
