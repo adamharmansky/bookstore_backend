@@ -68,7 +68,9 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/verifykey', (req, res) => {
-    res.send(verify_key(req.body.key) ? 200 : 401);
+    let verified = verify_key(req.body.key);
+    console.log("key " + req.body.key + (verified ? " not " : " ") + "allowed");
+    res.send(verified ? 200 : 401);
 });
 
 // Incomplete
