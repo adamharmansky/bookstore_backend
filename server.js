@@ -78,6 +78,25 @@ app.post('/verifykey', (req, res) => {
     res.send(verify_key(req.body.key) ? 200 : 401);
 });
 
+app.post('/book/remove', (req, res) => {
+    if (!urlObject.query.book) {
+        res.send(400);
+        return;
+    }
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
+    var sql_command = 'DELETE FROM books WHERE isbn=' + sql.escape(urlObject.query.book);
+    sql.query(sql_command, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send(500);
+            return;
+        }
+        res.send(200);
+    });
+}
 // Incomplete
 app.post('/book/new', (req, res) => {
     if (!verify_key(req.body.key)) {
