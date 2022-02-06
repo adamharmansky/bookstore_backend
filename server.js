@@ -96,7 +96,7 @@ app.post('/book/remove', (req, res) => {
             return;
         }
         var project_command = 'DELETE FROM projects WHERE isbn=' + sql.escape(urlObject.query.book);
-        sql.query(sql_command, (project_err, project_result) => {
+        sql.query(project_command, (project_err, project_result) => {
             if (project_err) {
                 console.log(project_err);
                 res.send(500);
