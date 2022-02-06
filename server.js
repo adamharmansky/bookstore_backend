@@ -79,6 +79,7 @@ app.post('/verifykey', (req, res) => {
 });
 
 app.post('/book/remove', (req, res) => {
+    const urlObject = url.parse(req.url, true);
     if (!urlObject.query.book) {
         res.send(400);
         return;
@@ -97,6 +98,7 @@ app.post('/book/remove', (req, res) => {
         res.send(200);
     });
 });
+
 // Incomplete
 app.post('/book/new', (req, res) => {
     if (!verify_key(req.body.key)) {
@@ -150,7 +152,8 @@ app.post('/book/new', (req, res) => {
 });
 
 // Api for getting info about 1 book
-app.get('/book', (req, res) => { const urlObject = url.parse(req.url, true);
+app.get('/book', (req, res) => {
+    const urlObject = url.parse(req.url, true);
     if (!urlObject.query.book) { // '?book=' is empty
         res.send(400);
         return;
