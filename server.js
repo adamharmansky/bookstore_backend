@@ -66,7 +66,7 @@ app.post('/login', (req, res) => {
                 key: key,
                 exp_time: Date.now() + default_exp_time
             });
-            console.log("access key generated: " + key);
+            console.log("access key generated for user " + req.body.username + ": " + key);
             res.send(key);
         } else {
             res.send(401);
@@ -156,8 +156,6 @@ app.post('/book/new', (req, res) => {
         req.body.image,
         req.body.content,
     ]]];
-    console.log(sql_command);
-    console.log(book_data);
     sql.query(sql_command, book_data, (err, result) => {
         if (err) {
             console.log(err);
@@ -166,8 +164,6 @@ app.post('/book/new', (req, res) => {
         }
         add_command = "INSERT IGNORE INTO authors (`author_name`) VALUES ?";
         add_data = [req.body.authors.map((author) => [author])];
-        console.log(add_command);
-        console.log(add_data);
         sql.query(add_command, add_data, (add_err, add_result) => {
             if (add_err) {
                 console.log(add_err);
@@ -175,7 +171,6 @@ app.post('/book/new', (req, res) => {
                 return;
             }
             author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE" + req.body.authors.map((author)=>(" `author_name`=" + sql.escape(author))).join(" OR");
-            console.log(author_command);
             sql.query(author_command, (author_err, author_result)=>{
                 if (author_err) {
                     console.log(author_err);
@@ -197,7 +192,6 @@ app.get('/book', (req, res) => {
     }
 
     var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id) WHERE isbn=" + sql.escape(urlObject.query.book);
-    console.log(sql_command);
 
     sql.query(sql_command, (err, result) => {
         if (err) {
@@ -207,7 +201,6 @@ app.get('/book', (req, res) => {
         }
         if (result.length > 0) {
             let author_command = "SELECT author_name, author_id FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE isbn=" + sql.escape(result[0].isbn);
-            console.log(author_command);
 
             sql.query(author_command, (authorErr, authorResult) => {
                 if (authorErr) {
@@ -231,7 +224,7 @@ app.get('/list', async (req, res) => {
 
     // SQL command for searching
     var sql_command = "SELECT * FROM books LEFT JOIN subjects USING (subject_id) LEFT JOIN languages USING (lang_id)";
-    var search = (urlObject.query.q) ? (" WHERE (title LIKE '%" + urlObject.query.q + "%' OR keywords LIKE '%" + urlObject.query.q + "%')") : '';
+    var search = (urlObject.query.q) ? (" WHERE (title LIKE " + sql.escape("%" + urlObject.query.q + "%") + " OR keywords LIKE " + sql.escape("%" + urlObject.query.q + "%") + ")") : '';
     if (urlObject.query.subject) {
         search += (urlObject.query.q ? "AND" : " WHERE") + " subject_id=" + sql.escape(urlObject.query.subject);
     }
@@ -246,8 +239,6 @@ app.get('/list', async (req, res) => {
     // Pagination - using LIMIT to chop up list into pages
     var page = urlObject.query.page ? urlObject.query.page : 0;
     sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
-
-    console.log(sql_command);
 
     sql.query(sql_command, (err, result) => {
         if (err) {
@@ -265,7 +256,6 @@ app.get('/list', async (req, res) => {
                 let author_command = "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE" + result.map((book) => {
                     return " isbn='" + book.isbn + "'";
                 }).join(" OR");
-                console.log(author_command);
                 sql.query(author_command, (authorErr, authorResult) => {
                     if (authorErr) {
                         console.log(authorErr);
@@ -299,8 +289,6 @@ app.get('/author/list', (req, res) => {
     var sql_command = "SELECT * FROM authors" + search;
     const page = urlObject.query.page ? urlObject.query.page : 0;
     sql_command += " LIMIT " + (page*page_size) + ", " + page_size;
-
-    console.log(sql_command);
 
     sql.query(sql_command, (err, result) => {
         if (err) {
@@ -359,8 +347,6 @@ app.get('/author', (req, res) => {
     // TODO: maybe return 400 if urlObject.query.author is null
     const search = urlObject.query.author ? " WHERE author_id='" + urlObject.query.author + "'" : "";
     var sql_command = "SELECT * FROM authors" + search;
-
-    console.log(sql_command);
 
     sql.query(sql_command, (err, result) => {
         if (err) {
@@ -428,7 +414,7 @@ app.post('/image/new', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.send(400);
     }
-    console.log("Uploading file into " + filePath + req.files.image.name);
+    console.log("Uploading file " + filePath + req.files.image.name);
     req.files.image.mv(filePath + req.files.image.name, (err) => {
         if (err) {
             res.send(500);
