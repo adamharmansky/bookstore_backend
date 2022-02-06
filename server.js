@@ -39,7 +39,7 @@ function verify_key(key) {
     keys = keys.filter((key) => (key.exp_time < Date.now()));
 
     for (let i in keys) {
-        if (i === key)
+        if (i.key === key)
             return true;
     }
     return false;
