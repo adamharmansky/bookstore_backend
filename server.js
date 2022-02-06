@@ -48,7 +48,7 @@ function verify_key(key) {
         }
     }
     console.log("key " + key + (verified ? " " : " not ") + "allowed");
-    return false;
+    return verified;
 }
 
 app.post('/login', (req, res) => {
