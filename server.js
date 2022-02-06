@@ -84,7 +84,7 @@ app.post('/book/new', (req, res) => {
         res.send(401);
         return;
     }
-    var sql_command = "INSERT INTO books (`isbn`, `title`, `subject_id`, `keywords`, `desc`, `read_time`, `pages`, `year_pub`, `lang_id`, `image`, `content`) VALUES (";
+    var sql_command = "INSERT INTO books (`isbn`, `title`, `subject_id`, `keywords`, `desc`, `read_time`, `pages`, `year_pub`, `lang_id`, `image`, `content`) VALUES ?";
     book_data = [[[
         req.body.isbn,
         req.body.title,
