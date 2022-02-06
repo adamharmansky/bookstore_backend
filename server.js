@@ -25,55 +25,6 @@ var options = {
 };
 
 
-/*
-    User authentication
-
-    /admin/login {
-        req {
-            password: {password} // atleast 14 char (+num,+znaky)
-        }
-        
-        // res
-        login success {
-            success: true // frontend redirect to 
-            key: {auth_key} // stored in cookies (should be very long)
-        }
-
-        login fail {
-            success: false
-            tries_left: {tries_left} // stop checking after ip sends too many
-        }
-    }
-
-    /addbook {
-        GET req {
-            key: {auth_key} // get from cookies
-        }
-
-        // GET res
-        success {
-            success: true // front -> show ui
-        }
-        fail {
-            success: false // front -> redir to login page
-        }
-
-        
-        POST req {
-            key: {auth_key} // get from cookies
-            data: {data}
-        }
-
-        // POST res
-        success {
-            success: true // front --> display something green, "kniha pridaná" and clear ui
-        }
-        fail {
-            success: false // front --> display something red, "kniha nepridaná" and clear ui
-        }
-    }
-*/
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -82,6 +33,17 @@ app.use(fileUpload());
 app.use(cookieParser());
 
 const keys = [];
+
+function verify_key(key) {
+    // remove expired keys
+    keys = keys.filter((key) => (key.exp_time < Date.now()));
+
+    for (let i in keys) {
+        if (i === key)
+            return true;
+    }
+    return false;
+}
 
 app.post('/login', (req, res) => {
     let sql_command = 'SELECT COUNT(*) FROM users WHERE username=' + sql.escape(req.body.username) + ' AND password=SHA1(' + sql.escape(req.body.password) + ')';
@@ -105,35 +67,33 @@ app.post('/login', (req, res) => {
     });
 });
 
-
 app.post('/verifykey', (req, res) => {
-    for (let i = 0; i < keys.length; i++) {
-        if (keys[i].key === req.body.key) {
-            res.send(200);
-            return;
-        }
-    }
-    res.send(401);
+    res.send(verify_key(req.body.key) ? 200 : 401);
 });
-
 
 // Incomplete
 app.post('/book/new', (req, res) => {
-    console.log(req.body);
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
     var sql_command = "INSERT INTO books (`isbn`, `title`, `subject_id`, `keywords`, `desc`, `read_time`, `pages`, `year_pub`, `lang_id`, `image`, `content`) VALUES (";
-    sql_command += sql.escape(req.body.isbn)      + ", ";
-    sql_command += sql.escape(req.body.title)     + ", ";
-    sql_command += sql.escape(req.body.subject)   + ", ";
-    sql_command += sql.escape(req.body.keywords)  + ", ";
-    sql_command += sql.escape(req.body.desc)      + ", ";
-    sql_command += sql.escape(req.body.read_time) + ", ";
-    sql_command += sql.escape(req.body.pages)     + ", ";
-    sql_command += sql.escape(req.body.year_pub)  + ", ";
-    sql_command += sql.escape(req.body.lang)      + ", ";
-    sql_command += sql.escape(req.body.image)     + ", ";
-    sql_command += sql.escape(req.body.content)   + ")";
+    book_data = [[[
+        req.body.isbn,
+        req.body.title,
+        req.body.subject,
+        req.body.keywords,
+        req.body.desc,
+        req.body.read_time,
+        req.body.pages,
+        req.body.year_pub,
+        req.body.lang,
+        req.body.image,
+        req.body.content,
+    ]]];
     console.log(sql_command);
-    sql.query(sql_command, (err, result) => {
+    console.log(book_data);
+    sql.query(sql_command, book_data, (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
