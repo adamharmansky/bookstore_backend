@@ -38,8 +38,8 @@ function verify_key(key) {
     // remove expired keys
     keys = keys.filter((k) => (k.exp_time < Date.now()));
 
-    for (let i in keys) {
-        if (i.key === key)
+    for (let i = 0; i < keys.length; i++) {
+        if (keys[i].key === key)
             return true;
     }
     return false;
@@ -69,7 +69,7 @@ app.post('/login', (req, res) => {
 
 app.post('/verifykey', (req, res) => {
     let verified = verify_key(req.body.key);
-    console.log("key " + req.body.key + (verified ? " not " : " ") + "allowed");
+    console.log("key " + req.body.key + (verified ? " " : " not ") + "allowed");
     res.send(verified ? 200 : 401);
 });
 
