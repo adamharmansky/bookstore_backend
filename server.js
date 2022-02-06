@@ -36,7 +36,7 @@ var keys = [];
 
 function verify_key(key) {
     // remove expired keys
-    keys = keys.filter((key) => (key.exp_time < Date.now()));
+    keys = keys.filter((k) => (k.exp_time < Date.now()));
 
     for (let i in keys) {
         if (i.key === key)
