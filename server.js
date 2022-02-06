@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(fileUpload());
 app.use(cookieParser());
 
-const keys = [];
+var keys = [];
 
 function verify_key(key) {
     // remove expired keys
