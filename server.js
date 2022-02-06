@@ -107,6 +107,35 @@ app.post('/book/remove', (req, res) => {
     });
 });
 
+app.post('/autor/remove', (req, res) => {
+    const urlObject = url.parse(req.url, true);
+    if (!urlObject.query.author) {
+        res.send(400);
+        return;
+    }
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
+    var sql_command = 'DELETE FROM authors WHERE author_id=' + sql.escape(urlObject.query.author);
+    sql.query(sql_command, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.send(500);
+            return;
+        }
+        var project_command = 'DELETE FROM projects WHERE author_id=' + sql.escape(urlObject.query.author);
+        sql.query(project_command, (project_err, project_result) => {
+            if (project_err) {
+                console.log(project_err);
+                res.send(500);
+                return;
+            }
+            res.send(200);
+        });
+    });
+});
+
 // Incomplete
 app.post('/book/new', (req, res) => {
     if (!verify_key(req.body.key)) {
