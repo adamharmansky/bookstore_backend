@@ -96,7 +96,7 @@ app.post('/book/remove', (req, res) => {
         }
         res.send(200);
     });
-}
+});
 // Incomplete
 app.post('/book/new', (req, res) => {
     if (!verify_key(req.body.key)) {
