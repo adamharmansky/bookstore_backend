@@ -95,7 +95,15 @@ app.post('/book/remove', (req, res) => {
             res.send(500);
             return;
         }
-        res.send(200);
+        var project_command = 'DELETE FROM projects WHERE isbn=' + sql.escape(urlObject.query.book);
+        sql.query(sql_command, (project_err, project_result) => {
+            if (project_err) {
+                console.log(project_err);
+                res.send(500);
+                return;
+            }
+            res.send(200);
+        });
     });
 });
 
