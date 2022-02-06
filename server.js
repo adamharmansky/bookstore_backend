@@ -35,10 +35,11 @@ app.use(cookieParser());
 var keys = [];
 
 function verify_key(key) {
-    // remove expired keys
-    keys = keys.filter((k) => (k.exp_time < Date.now()));
-
     for (let i = 0; i < keys.length; i++) {
+        if (keys[i].exp_time > Date.now()) {
+            keys.splice(i--);
+            continue;
+        }
         if (keys[i].key === key)
             return true;
     }
