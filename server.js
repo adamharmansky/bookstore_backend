@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 
 const page_size = 6;
 const port = 3001;
-const default_exp_time = 3600;
+const default_exp_time = 3600000;
 
 const filePath='/web/bookstore/files/';
 const fileUrl='https://bookstore.harmansky.xyz/pub/';
@@ -38,11 +38,12 @@ function verify_key(key) {
     let verified = false;
     for (let i = 0; i < keys.length; i++) {
         if (keys[i].key === key) {
-            // if (keys[i].exp_time < Date.now()) {
-            //     keys.splice(i);
-            //     verified = false;
-            //     break;
-            // }
+            if (keys[i].exp_time < Date.now()) {
+                console.log("removing old key " + key);
+                keys.splice(i);
+                verified = false;
+                break;
+            }
             verified = true;
             break;
         }
