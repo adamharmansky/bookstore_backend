@@ -38,11 +38,11 @@ function verify_key(key) {
     let verified = false;
     for (let i = 0; i < keys.length; i++) {
         if (keys[i].key === key) {
-            if (keys[i].exp_time < Date.now()) {
-                keys.splice(i);
-                verified = false;
-                break;
-            }
+            // if (keys[i].exp_time < Date.now()) {
+            //     keys.splice(i);
+            //     verified = false;
+            //     break;
+            // }
             verified = true;
             break;
         }
