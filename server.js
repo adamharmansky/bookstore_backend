@@ -107,7 +107,7 @@ app.post('/book/remove', (req, res) => {
     });
 });
 
-app.post('/autor/remove', (req, res) => {
+app.post('/author/remove', (req, res) => {
     const urlObject = url.parse(req.url, true);
     if (!urlObject.query.author) {
         res.send(400);
