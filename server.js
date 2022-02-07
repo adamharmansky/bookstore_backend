@@ -74,6 +74,20 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.post('/logout', (req, res) => {
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
+    // drop the key from the list
+    for (let i = 0; i < keys.length; i++) {
+        if (keys[i].key == req.body.key) {
+            keys.splice(i);
+            break;
+        }
+    }
+});
+
 app.post('/verifykey', (req, res) => {
     res.send(verify_key(req.body.key) ? 200 : 401);
 });
@@ -431,7 +445,7 @@ var server = https.createServer(options, app);
 // requires unix socket authentication - script MUST be run as root!!!!
 sql.connect((err) => {
     if (err) throw err;
-    console.log('Connected to SQL database');
+    console.log('Connected to SQL server');
     sql.query("USE bookstore", (err, result) => {
         if (err) throw err;
         console.log('Selected database: ' + JSON.stringify(result));
