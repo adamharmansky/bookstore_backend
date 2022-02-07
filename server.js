@@ -83,9 +83,12 @@ app.post('/logout', (req, res) => {
     for (let i = 0; i < keys.length; i++) {
         if (keys[i].key == req.body.key) {
             keys.splice(i);
-            break;
+            res.send(200);
+            return;
         }
     }
+    // if we didn't find any matchnig key, break
+    res.send(404);
 });
 
 app.post('/verifykey', (req, res) => {
