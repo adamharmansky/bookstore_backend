@@ -10,7 +10,7 @@ const fileUpload = require('express-fileupload');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
-const page_size = 6;
+const page_size = 10;
 const port = 3001;
 const default_exp_time = 3600000;
 
