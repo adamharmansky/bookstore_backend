@@ -42,7 +42,7 @@ exports.login = (req, res, sql) => {
                 key: key,
                 exp_time: Date.now() + default_exp_time
             });
-            console.log("access key generated for user " + req.body.username + ": " + key);
+            console.log("access key generated for user " + req.body.username); 
             res.send(key);
         } else {
             res.send(401);
