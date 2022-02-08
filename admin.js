@@ -18,7 +18,7 @@ function verify_key(key) {
             break;
         }
     }
-    console.log("key " + key + (verified ? " " : " not ") + "allowed");
+    console.log("key " + (key.substring(0,5)+"...") + (verified ? " " : " not ") + "allowed");
     return verified;
 };
 
