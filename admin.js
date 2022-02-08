@@ -23,7 +23,7 @@ function verify_key(key) {
 };
 
 function hash_password(username, password) {
-    const hash = crypto.createHash('sha256').update(password).update(username).digest('base64');
+    const hash = crypto.createHash('sha256').update(username).update(password).digest('base64');
     return hash;
 };
 
