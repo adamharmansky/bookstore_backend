@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 var keys = [];
 
 exports.verify_key = (key) => {

@@ -7,7 +7,6 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
-const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const admin = require('./admin.js');
 
