@@ -29,7 +29,7 @@ function hash_password(username, password) {
 
 exports.login = (req, res, sql) => {
     const hash = hash_password(req.body.username, req.body.password);
-    let sql_command = `SELECT COUNT(*) FROM users WHERE username=${sql.escape(req.body.username)} AND password=${sql.escape(hash)})`;
+    let sql_command = `SELECT COUNT(*) FROM users WHERE username=${sql.escape(req.body.username)} AND password=${sql.escape(hash)}`;
     sql.query(sql_command, (err, result)=> {
         if (err) {
             console.log(err);
