@@ -3,7 +3,7 @@ const default_exp_time = 3600000;
 
 var keys = [];
 
-exports.verify_key = (key) => {
+function verify_key(key) {
     let verified = false;
     for (let i = 0; i < keys.length; i++) {
         if (keys[i].key === key) {
