@@ -22,13 +22,13 @@ function verify_key(key) {
     return verified;
 };
 
-function hash_password(password, salt) {
-    const hash = crypto.createHash('sha256').update(password).update(salt).digest('base64');
-
+function hash_password(username, password) {
+    const hash = crypto.createHash('sha256').update(password).update(username).digest('base64');
+    return hash;
 };
 
 exports.login = (req, res, sql) => {
-    const hash = hash_password(req.body.password, req.body.username);
+    const hash = hash_password(req.body.username, req.body.password);
     let sql_command = `SELECT COUNT(*) FROM users WHERE username=${sql.escape(req.body.username)} AND password=${sql.escape(hash)})`;
     sql.query(sql_command, (err, result)=> {
         if (err) {
