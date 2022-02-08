@@ -90,7 +90,7 @@ app.get('/list', async (req, res) => {
 
     // Ordering of the list
     // we need to filter the options manually so we don't get an sql injection
-    sql_command += ' ORDER_BY '
+    sql_command += ' ORDER BY '
     switch (urlObject.query.order_by) {
         case 'isbn':
         case 'title':
