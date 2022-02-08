@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const default_exp_time = 3600000;
 
 var keys = [];
 

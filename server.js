@@ -12,7 +12,6 @@ const admin = require('./admin.js');
 
 const page_size = 10;
 const port = 3001;
-const default_exp_time = 3600000;
 
 const filePath = '/web/bookstore/files/';
 const fileUrl = 'https://bookstore.harmansky.xyz/pub/';
