@@ -124,7 +124,7 @@ app.get('/list', async (req, res) => {
                 }
                 sql.query(
                     "SELECT author_name, author_id, isbn FROM projects LEFT JOIN authors USING (author_id) LEFT JOIN books USING(isbn) WHERE"
-                    + result.map((book) => (" isbn=" + sql.escape(book.isbn))).join(" OR");
+                    + result.map((book) => (" isbn=" + sql.escape(book.isbn))).join(" OR")
                 , (authorErr, authorResult) => {
                     if (authorErr) {
                         console.log(authorErr);
