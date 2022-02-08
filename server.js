@@ -90,6 +90,7 @@ app.get('/list', async (req, res) => {
 
     // Ordering of the list
     // we need to filter the options manually so we don't get an sql injection
+    sql_command += ' ORDER_BY '
     switch (urlObject.query.order_by) {
         case 'isbn':
         case 'title':
@@ -102,7 +103,7 @@ app.get('/list', async (req, res) => {
         default:
             sql_command += 'year_pub';
     }
-    sql_command += urlObject.query.reverse ? 'DESC' : 'ASC';
+    sql_command += urlObject.query.reverse ? ' DESC' : ' ASC';
 
     // pagination
     var page = isNaN(urlObject.query.page) ? 0 : parseInt(urlObject.query.page);
