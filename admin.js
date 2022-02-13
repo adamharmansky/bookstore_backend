@@ -18,12 +18,18 @@ function verify_key(key) {
             break;
         }
     }
-    console.log("key " + key + (verified ? " " : " not ") + "allowed");
+    console.log("key " + (key.substring(0,5)+"...") + (verified ? " " : " not ") + "allowed");
     return verified;
 };
 
+function hash_password(username, password) {
+    const hash = crypto.createHash('sha256').update(username).update(password).digest('base64');
+    return hash;
+};
+
 exports.login = (req, res, sql) => {
-    let sql_command = 'SELECT COUNT(*) FROM users WHERE username=' + sql.escape(req.body.username) + ' AND password=SHA1(' + sql.escape(req.body.password) + ')';
+    const hash = hash_password(req.body.username, req.body.password);
+    let sql_command = `SELECT COUNT(*) FROM users WHERE username=${sql.escape(req.body.username)} AND password=${sql.escape(hash)}`;
     sql.query(sql_command, (err, result)=> {
         if (err) {
             console.log(err);
@@ -36,7 +42,7 @@ exports.login = (req, res, sql) => {
                 key: key,
                 exp_time: Date.now() + default_exp_time
             });
-            console.log("access key generated for user " + req.body.username + ": " + key);
+            console.log("access key generated for user " + req.body.username); 
             res.send(key);
         } else {
             res.send(401);
@@ -75,13 +81,13 @@ exports.book_remove = (req, res, sql) => {
         res.send(401);
         return;
     }
-    sql.query('DELETE FROM books WHERE isbn=' + sql.escape(urlObject.query.book), (err, result) => {
+    sql.query(`DELETE FROM books WHERE isbn=${sql.escape(urlObject.query.book)}`, (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
             return;
         }
-        sql.query('DELETE FROM projects WHERE isbn=' + sql.escape(urlObject.query.book), (project_err, project_result) => {
+        sql.query(`DELETE FROM projects WHERE isbn=${sql.escape(urlObject.query.book)}`, (project_err, project_result) => {
             if (project_err) {
                 console.log(project_err);
                 res.send(500);
@@ -102,13 +108,13 @@ exports.author_remove = (req, res, sql) => {
         res.send(401);
         return;
     }
-    sql.query('DELETE FROM authors WHERE author_id=' + sql.escape(urlObject.query.author), (err, result) => {
+    sql.query(`DELETE FROM authors WHERE author_id=${sql.escape(urlObject.query.author)}`, (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
             return;
         }
-        sql.query('DELETE FROM projects WHERE author_id=' + sql.escape(urlObject.query.author), (project_err, project_result) => {
+        sql.query(`DELETE FROM projects WHERE author_id=${sql.escape(urlObject.query.author)}`, (project_err, project_result) => {
             if (project_err) {
                 console.log(project_err);
                 res.send(500);
