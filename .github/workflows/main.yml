@@ -27,6 +27,8 @@ jobs:
 #       with:
 #         node-version: 16
 #         cache: 'npm'
+      - name: Install packages
+        run: npm install
       - name: Deploy
         uses: easingthemes/ssh-deploy@main
         env:
