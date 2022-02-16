@@ -1,6 +1,7 @@
 const url = require('url');
 const crypto = require('crypto');
 const default_exp_time = 3600000;
+const config = require('./config.js');
 
 var keys = [];
 
@@ -181,8 +182,8 @@ exports.image_new = (req, res, sql) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.send(400);
     }
-    console.log("Uploading file " + filePath + req.files.image.name);
-    req.files.image.mv(filePath + req.files.image.name, (err) => {
+    console.log("Uploading file " + config.filePath + req.files.image.name);
+    req.files.image.mv(config.filePath + req.files.image.name, (err) => {
         if (err) {
             res.send(500);
             console.log(err);
