@@ -24,17 +24,16 @@ const db = new BookDatabase();
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true, limit: '10000kb'}));
 app.use(fileUpload());
 app.use(cookieParser());
 
-app.post('/login', (req, res)         => admin.login(req, res, db.sql));
-app.post('/logout', (req, res)        => admin.logout(req, res, db.sql));
-app.post('/verifykey', (req, res)     => admin.verifykey(req, res, db.sql));
-app.post('/book/remove', (req, res)   => admin.book_remove(req, res, db.sql));
-app.post('/author/remove', (req, res) => admin.author_remove(req, res, db.sql));
+app.post('/login', (req, res)         => admin.login(req, res, db));
+app.post('/logout', (req, res)        => admin.logout(req, res));
+app.post('/verifykey', (req, res)     => admin.verifykey(req, res));
+app.post('/book/remove', (req, res)   => admin.book_remove(req, res, db));
+app.post('/author/remove', (req, res) => admin.author_remove(req, res, db));
 app.post('/book/new', (req, res)      => admin.book_new(req, res, db.sql));
-app.post('/image/new', (req, res)     => admin.image_new(req, res, db.sql));
 
 // detailed info on a single book
 app.get('/book', (req, res) => {

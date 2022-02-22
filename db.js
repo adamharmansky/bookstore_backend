@@ -116,7 +116,7 @@ module.exports = class BookDatabase {
     }
 
     author_search_str(query) {
-        return query ? " WHERE author_name LIKE " + sql.escape('%' + query + '%') : "";
+        return query ? " WHERE author_name LIKE " + this.sql.escape('%' + query + '%') : "";
     }
 
     author_count(query, then) {
@@ -177,5 +177,33 @@ module.exports = class BookDatabase {
                 then(null, null);
             } else then(null, result[0]);
         });
+    }
+
+    verify_password(username, hash, then) {
+        this.sql.query('SELECT COUNT(*) FROM users WHERE username=? AND password=?', [username, hash], (err, result)=> {
+            if (err) {
+                then(err, null);
+            } else if (result[0]['COUNT(*)'] > 0) {
+                then(null, true);
+            } else {
+                then(null, false);
+            }
+        });
+    }
+
+    remove_book(isbn, then) {
+        this.sql.query('DELETE FROM books WHERE isbn=?', [isbn], then);
+    }
+
+    remove_project_by_isbn(isbn, then) {
+        this.sql.query('DELETE FROM projects WHERE isbn=?', [isbn], then);
+    }
+
+    remove_project_by_author(id, then) {
+        this.sql.query('DELETE FROM projects WHERE author_id=?', [id], then);
+    }
+
+    remove_author(id, then) {
+        this.sql.query('DELETE FROM authors WHERE author_id=?', [id], then);
     }
 };
