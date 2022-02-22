@@ -1,6 +1,7 @@
 const url = require('url');
 const crypto = require('crypto');
 const default_exp_time = 3600000;
+const config = require('./config.js');
 
 var keys = [];
 
@@ -27,16 +28,13 @@ function hash_password(username, password) {
     return hash;
 };
 
-exports.login = (req, res, sql) => {
+exports.login = (req, res, db) => {
     const hash = hash_password(req.body.username, req.body.password);
-    let sql_command = `SELECT COUNT(*) FROM users WHERE username=${sql.escape(req.body.username)} AND password=${sql.escape(hash)}`;
-    sql.query(sql_command, (err, result)=> {
+    db.verify_password(req.body.username, hash, (err, result) => {
         if (err) {
-            console.log(err);
             res.send(500);
-            return;
-        }
-        if (result[0]['COUNT(*)'] > 0) {
+            console.log(err);
+        } else if (result) {
             let key = crypto.randomBytes(48).toString('base64');
             keys.push({
                 key: key,
@@ -50,7 +48,7 @@ exports.login = (req, res, sql) => {
     });
 };
 
-exports.logout = (req, res, sql) => {
+exports.logout = (req, res) => {
     if (!verify_key(req.body.key)) {
         res.send(401);
         return;
@@ -67,11 +65,11 @@ exports.logout = (req, res, sql) => {
     res.send(404);
 };
 
-exports.verifykey = (req, res, sql) => {
+exports.verifykey = (req, res) => {
     res.send(verify_key(req.body.key) ? 200 : 401);
 };
 
-exports.book_remove = (req, res, sql) => {
+exports.book_remove = (req, res, db) => {
     const urlObject = url.parse(req.url, true);
     if (!urlObject.query.book) {
         res.send(400);
@@ -81,13 +79,13 @@ exports.book_remove = (req, res, sql) => {
         res.send(401);
         return;
     }
-    sql.query(`DELETE FROM books WHERE isbn=${sql.escape(urlObject.query.book)}`, (err, result) => {
+    db.remove_book(urlObject.query.book, (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
             return;
         }
-        sql.query(`DELETE FROM projects WHERE isbn=${sql.escape(urlObject.query.book)}`, (project_err, project_result) => {
+        db.remove_project_by_isbn(urlObject.query.book, (project_err, project_result) => {
             if (project_err) {
                 console.log(project_err);
                 res.send(500);
@@ -98,7 +96,7 @@ exports.book_remove = (req, res, sql) => {
     });
 };
 
-exports.author_remove = (req, res, sql) => {
+exports.author_remove = (req, res, db) => {
     const urlObject = url.parse(req.url, true);
     if (!urlObject.query.author) {
         res.send(400);
@@ -108,13 +106,13 @@ exports.author_remove = (req, res, sql) => {
         res.send(401);
         return;
     }
-    sql.query(`DELETE FROM authors WHERE author_id=${sql.escape(urlObject.query.author)}`, (err, result) => {
+    db.remove_author(urlObject.query.author, (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
             return;
         }
-        sql.query(`DELETE FROM projects WHERE author_id=${sql.escape(urlObject.query.author)}`, (project_err, project_result) => {
+        db.remove_project_by_author(urlObject.query.author, (project_err, project_result) => {
             if (project_err) {
                 console.log(project_err);
                 res.send(500);
@@ -130,6 +128,13 @@ exports.book_new = (req, res, sql) => {
         res.send(401);
         return;
     }
+    let iname = Date.now() + req.files.image.name.match("\.[^\.]\+$");
+    if (req.files) {
+        console.log("Uploading file " + iname);
+        req.files.image.mv(config.filePath + iname, (err) => {
+            console.log(err);
+        });
+    }
     sql.query(
       "INSERT INTO books (`isbn`, `title`, `subject_id`, `keywords`, `desc`, `read_time`, `pages`, `year_pub`, `lang_id`, `image`, `content`) VALUES ?",
       [[[
@@ -142,52 +147,39 @@ exports.book_new = (req, res, sql) => {
         req.body.pages,
         req.body.year_pub,
         req.body.lang,
-        req.body.image,
+        "/pub/" + iname,
         req.body.content,
-      ]]],
-      (err, result) => {
+      ]]], (err, result) => {
         if (err) {
             console.log(err);
             res.send(500);
             return;
         }
-        sql.query(
-          "INSERT IGNORE INTO authors (`author_name`) VALUES ?",
-          [req.body.authors.map((author) => [author])],
-          (add_err, add_result) => {
-            if (add_err) {
-                console.log(add_err);
-                res.send(500);
-                return;
-            }
-            author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE" + req.body.authors.map((author)=>(" `author_name`=" + sql.escape(author))).join(" OR");
-            sql.query(author_command, (author_err, author_result)=>{
-                if (author_err) {
-                    console.log(author_err);
+        console.log(typeof req.body.authors);
+        console.log(req.body.authors);
+        if (req.body.authors) {
+            sql.query(
+              "INSERT IGNORE INTO authors (`author_name`) VALUES ?",
+              [[req.body.authors.split(',')]],
+              (add_err, add_result) => {
+                if (add_err) {
+                    console.log(add_err);
                     res.send(500);
                     return;
                 }
-                res.send(200);
+                author_command = "INSERT INTO projects (`author_id`, `isbn`) SELECT `author_id`, " + sql.escape(req.body.isbn) + " FROM authors WHERE" + req.body.authors.split(',').map((author)=>(" `author_name`=" + sql.escape(author))).join(" OR");
+                console.log(author_command);
+                sql.query(author_command, (author_err, author_result)=>{
+                    if (author_err) {
+                        console.log(author_err);
+                        res.send(500);
+                        return;
+                    }
+                    res.send(200);
+                });
             });
-        });
-    });
-};
-
-exports.image_new = (req, res, sql) => {
-    if (!verify_key(req.body.key)) {
-        res.send(401);
-        return;
-    }
-    if (!req.files || Object.keys(req.files).length === 0) {
-        res.send(400);
-    }
-    console.log("Uploading file " + filePath + req.files.image.name);
-    req.files.image.mv(filePath + req.files.image.name, (err) => {
-        if (err) {
-            res.send(500);
-            console.log(err);
-            return;
+        } else {
+            res.send(200);
         }
-        res.send(200);
     });
 };
