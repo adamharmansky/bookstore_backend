@@ -55,53 +55,61 @@ app.get('/book', (req, res) => {
 app.get('/list', (req, res) => {
     const urlObject = url.parse(req.url, true);
     db.book_list(
-      urlObject.query.q,
-      isNaN(urlObject.query.page)?0:urlObject.query.page,
-      urlObject.query.subject,
-      urlObject.query.order_by,
-      urlObject.query.reverse, (err, result) => {
-        if (err) {
-            console.log(err);
-            res.send(500);
-            return;
-        }
-        db.book_count(urlObject.query.q, urlObject.query.subject, (count_err, count_result) => {
-            if (count_err) {
-                console.log(count_err);
+        urlObject.query.q,
+        isNaN(urlObject.query.page)?0:urlObject.query.page,
+        urlObject.query.subject,
+        urlObject.query.order_by,
+        urlObject.query.reverse,
+        (err, result) => {
+            if (err) {
+                console.log(err);
                 res.send(500);
                 return;
             }
-            res.send({
-                books: result,
-                pageCount: Math.ceil(count_result/config.page_size)
-            });
-        });
-    });
+            db.book_count(
+                urlObject.query.q,
+                urlObject.query.subject, 
+                (count_err, count_result) => {
+                    if (count_err) {
+                        console.log(count_err);
+                        res.send(500);
+                        return;
+                    }
+                    res.send({
+                        books: result,
+                        pageCount: Math.ceil(count_result/config.page_size)
+                    });
+                }
+            );
+        }
+    );
 });
 
 // list of authors, with their books
 app.get('/author/list', (req, res) => {
     const urlObject = url.parse(req.url, true);
     db.author_list(
-      urlObject.query.q,
-      isNaN(urlObject.query.page)?0:urlObject.query.page, (err, result) => {
-        if (err) {
-            console.log(err);
-            res.send(500);
-            return;
-        }
-        db.author_count(urlObject.query.q, (count_err, count_result) => {
-            if (count_err) {
-                console.log(count_err);
+        urlObject.query.q,
+        isNaN(urlObject.query.page)?0:urlObject.query.page,
+        (err, result) => {
+            if (err) {
+                console.log(err);
                 res.send(500);
                 return;
             }
-            res.send({
-                authors: result,
-                pageCount: Math.ceil(count_result/config.page_size)
+            db.author_count(urlObject.query.q, (count_err, count_result) => {
+                if (count_err) {
+                    console.log(count_err);
+                    res.send(500);
+                    return;
+                }
+                res.send({
+                    authors: result,
+                    pageCount: Math.ceil(count_result/config.page_size)
+                });
             });
-        });
-    });
+        }
+    );
 });
 
 // quick list of authors to get their names (for AddBook, etc.)
