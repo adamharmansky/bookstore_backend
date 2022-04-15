@@ -59,7 +59,7 @@ app.get('/list', (req, res) => {
         isNaN(urlObject.query.page)?0:urlObject.query.page,
         urlObject.query.subject,
         urlObject.query.order_by,
-        Boolean(urlObject.query.reverse),
+        urlObject.query.reverse == "true",
         (err, result) => {
             if (err) {
                 console.log(err);
