@@ -35,6 +35,20 @@ app.post('/book/remove', (req, res)   => admin.book_remove(req, res, db));
 app.post('/author/remove', (req, res) => admin.author_remove(req, res, db));
 app.post('/book/new', (req, res)      => admin.book_new(req, res, db.sql));
 
+app.post('/gallery', (req, res)       =>  admin.gallery_new(req, res, db.sql));
+app.delete('/gallery', (req, res)     =>  admin.gallery_remove(req, res, db.sql));
+
+// pictures in the gallery on the front page
+app.get('/gallery', (req, res) => {
+    db.gallery((err, result) => {
+        if (err) {
+            res.send(500);
+            console.log(err);
+        } else
+            res.send (result);
+    });
+});
+
 // detailed info on a single book
 app.get('/book', (req, res) => {
     const urlObject = url.parse(req.url, true);

@@ -191,6 +191,10 @@ module.exports = class BookDatabase {
         });
     }
 
+    gallery(then) {
+        this.sql.query('SELECT * FROM gallery', then);
+    }
+
     remove_book(isbn, then) {
         this.sql.query('DELETE FROM books WHERE isbn=?', [isbn], then);
     }

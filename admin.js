@@ -123,6 +123,55 @@ exports.author_remove = (req, res, db) => {
     });
 };
 
+exports.gallery_new = (req, res, sql) => {
+    if (!verify_key(req.body.key)) {
+        res.send(401);
+        return;
+    }
+    let iname = Date.now() + req.files.image.name.match("\.[^\.]\+$");
+    if (req.files) {
+        console.log("Uploading file " + iname);
+        req.files.image.mv(config.filePath + iname, (err) => {
+            console.log(err);
+        });
+    }
+    
+    sql.query("INSERT INTO gallery (picture_path) VALUES (?)",
+        ["/pub/" + iname],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                res.send(500);
+                return;
+            }
+            res.send(200);
+            return;
+    });
+};
+
+exports.gallery_remove = (req, res, sql) => {
+    // I have no will re-do the rest of the code, but at least I
+    // did this (last) function properly.
+    var parsedCookies = {};
+    const cookies = req.headers.cookie.split("; ").forEach((c)=>{const k = c.split('='); parsedCookies[k[0]] = k[1]});
+    if (!verify_key(parsedCookies.session_key)) {
+        res.send(401);
+        return;
+    }
+    const urlObject = url.parse(req.url, true);
+    sql.query("DELETE FROM gallery WHERE picture_id=?",
+        [urlObject.query.id],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                res.send(500);
+                return;
+            }
+            res.send(200);
+            return;
+    });
+};
+
 exports.book_new = (req, res, sql) => {
     if (!verify_key(req.body.key)) {
         res.send(401);
@@ -155,8 +204,6 @@ exports.book_new = (req, res, sql) => {
             res.send(500);
             return;
         }
-        console.log(typeof req.body.authors);
-        console.log(req.body.authors);
         if (req.body.authors) {
             sql.query(
               "INSERT IGNORE INTO authors (`author_name`) VALUES ?",
