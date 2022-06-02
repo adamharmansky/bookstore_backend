@@ -24,7 +24,7 @@ const db = new BookDatabase();
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true, limit: '10000kb'}));
+app.use(bodyParser.urlencoded({extended: true, limit: '100000kb'}));
 app.use(fileUpload());
 app.use(cookieParser());
 
